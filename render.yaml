@@ -7,7 +7,7 @@ services:
     name: diwaanshahkhwaan
     runtime: node
     region: singapore # closest Render region to Perth
-    plan: starter # "free" also works for testing, but it sleeps when idle (pauses reminders and hold expiry)
+    plan: free # staging: sleeps when idle. Use "starter" for production so reminders and hold expiry run continuously
     buildCommand: npm ci && npm run build
     startCommand: npm run start:render # applies migrations + idempotent seed, then starts
     healthCheckPath: /api/health
@@ -37,10 +37,7 @@ services:
         value: console
       - key: SMS_PROVIDER
         value: none
-      - key: SEED_OWNER_EMAIL
-        sync: false # set in the Render dashboard
-      - key: SEED_OWNER_PASSWORD
-        sync: false # set in the Render dashboard (12+ characters)
+      # Set in the dashboard to create the first owner login: SEED_OWNER_EMAIL, SEED_OWNER_PASSWORD (12+ chars).
       # Optional, set later in the dashboard: APP_URL (custom domain), STRIPE_SECRET_KEY,
       # STRIPE_WEBHOOK_SECRET, RESEND_API_KEY, EMAIL_FROM, TWILIO_* (see .env.example)
 
@@ -49,5 +46,5 @@ databases:
     databaseName: diwaanshahkhwaan
     user: dsk
     region: singapore
-    plan: basic-256mb
+    plan: free # staging: Render free databases expire after 30 days. Use basic-256mb for production
     postgresMajorVersion: "16"
