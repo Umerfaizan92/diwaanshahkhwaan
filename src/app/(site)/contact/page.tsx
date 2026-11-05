@@ -20,7 +20,7 @@ export default async function ContactPage({ searchParams }: PageProps<"/contact"
     <>
       <PageHeader title="Contact" intro="The quickest way to reach us is a call or text. For anything else, send a message below." />
       <Container className="space-y-14 py-12">
-        <PickupContact settings={settings} hours={hours} />
+        <PickupContact settings={settings} hours={hours} headingLevel={2} />
         <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr]">
           <div>
             <h2 className="font-display text-2xl sm:text-3xl">Send us a message</h2>

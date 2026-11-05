@@ -3,6 +3,8 @@ import { DishCard } from "@/components/site/DishCard";
 import { Container, PageHeader } from "@/components/site/PageHeader";
 import { getPublicMenu } from "@/lib/server/menu";
 import { getSettings } from "@/lib/server/settings";
+import { JsonLd } from "@/components/site/JsonLd";
+import { menuLd } from "@/lib/server/structured-data";
 
 export const metadata: Metadata = {
   title: "Menu",
@@ -14,6 +16,7 @@ export default async function MenuPage() {
   const [menu, settings] = await Promise.all([getPublicMenu(), getSettings()]);
   return (
     <>
+      <JsonLd data={menuLd(menu)} />
       <PageHeader
         title="Menu"
         intro={
@@ -40,7 +43,7 @@ export default async function MenuPage() {
         {menu.length === 0 ? (
           <p className="py-20 text-center text-muted">The menu is being updated. Please check back soon or call us to order.</p>
         ) : null}
-        {menu.map((c) => (
+        {menu.map((c, ci) => (
           <section key={c.slug} id={c.slug} aria-labelledby={`h-${c.slug}`} className="scroll-mt-32 py-10 lg:scroll-mt-36">
             <div className="mb-6 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b border-line/60 pb-4">
               <h2 id={`h-${c.slug}`} className="font-display text-2xl font-semibold sm:text-3xl">
@@ -49,9 +52,9 @@ export default async function MenuPage() {
               {c.description ? <p className="text-muted">{c.description}</p> : null}
             </div>
             <ul className="grid grid-cols-2 gap-x-2 gap-y-4 sm:gap-x-3 md:grid-cols-3 lg:grid-cols-4">
-              {c.dishes.map((d) => (
+              {c.dishes.map((d, di) => (
                 <li key={d.id}>
-                  <DishCard dish={d} sizes="(min-width:1024px) 22vw, (min-width:768px) 30vw, 46vw" />
+                  <DishCard dish={d} priority={ci === 0 && di < 2} sizes="(min-width:1024px) 22vw, (min-width:768px) 30vw, 46vw" />
                 </li>
               ))}
             </ul>

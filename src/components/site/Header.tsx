@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ThemeToggle } from "./ThemeToggle";
 import { buttonClass } from "@/components/ui/Button";
 import { CartButton } from "@/components/shop/CartButton";
@@ -34,7 +33,6 @@ export function Header() {
     const next = typeof v === "function" ? v(open) : v;
     setOpenOn(next ? pathname : null);
   };
-  const reduce = useReducedMotion();
   const menuBtn = useRef<HTMLButtonElement>(null);
   const firstLink = useRef<HTMLAnchorElement>(null);
 
@@ -121,16 +119,11 @@ export function Header() {
         </div>
       </div>
 
-      <AnimatePresence>
-        {open && (
-          <motion.nav
+      {open && (
+          <nav
             id="mobile-nav"
             aria-label="Mobile"
-            initial={reduce ? false : { opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
-            className="h-[calc(100dvh-4rem)] overflow-y-auto border-t border-line bg-bg px-4 pb-10 pt-4 lg:hidden"
+            className="drop-in h-[calc(100dvh-4rem)] overflow-y-auto border-t border-line bg-bg px-4 pb-10 pt-4 lg:hidden"
           >
             <ul className="flex flex-col">
               {NAV.map((l, i) => (
@@ -156,9 +149,8 @@ export function Header() {
             <Link href="/menu" className={buttonClass("gold", "lg", "mt-8 w-full")}>
               Order now
             </Link>
-          </motion.nav>
+          </nav>
         )}
-      </AnimatePresence>
     </header>
   );
 }

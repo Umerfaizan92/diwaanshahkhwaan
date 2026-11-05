@@ -108,17 +108,17 @@ export function PickupPicker({ lines, value, onChange, error, refreshKey }: { li
                 type="button"
                 disabled={!open}
                 aria-pressed={active}
-                aria-label={`${formatDateLong(d.date)}${open ? "" : ` — ${d.reason ?? "unavailable"}`}`}
-                title={open ? undefined : d.reason}
+                title={open ? formatDateLong(d.date) : d.reason}
                 onKeyDown={(e) => onDateKey(e, i)}
                 onClick={() => setActiveDate(d.date)}
                 className={`relative flex w-16 shrink-0 flex-col items-center rounded-2xl border px-1 py-2.5 transition-colors ${
                   active ? "border-gold bg-gold text-gold-ink" : open ? "border-line bg-sunken hover:border-gold/70" : "cursor-not-allowed border-line/50 text-muted/60 line-through decoration-1"
                 }`}
               >
-                <span className="text-xs">{p.wd}</span>
-                <span className="font-display text-xl leading-tight">{p.day}</span>
+                <span className="text-xs">{p.wd}</span>{" "}
+                <span className="font-display text-xl leading-tight">{p.day}</span>{" "}
                 <span className="text-xs">{p.mon}</span>
+                {open ? null : <span className="sr-only"> — {d.reason ?? "unavailable"}</span>}
               </button>
             );
           })}

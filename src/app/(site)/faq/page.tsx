@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Container, PageHeader } from "@/components/site/PageHeader";
 import { getSettings } from "@/lib/server/settings";
 import { formatTime12 } from "@/lib/domain/hours";
+import { JsonLd } from "@/components/site/JsonLd";
 
 export const metadata: Metadata = {
   title: "FAQs",
@@ -60,7 +61,7 @@ export default async function FaqPage() {
           ))}
         </div>
       </Container>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <JsonLd data={jsonLd} />
     </>
   );
 }

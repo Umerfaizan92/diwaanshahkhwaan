@@ -9,6 +9,8 @@ import { buttonClass } from "@/components/ui/Button";
 import { getFeaturedDishes, getPublicMenu } from "@/lib/server/menu";
 import { getOpeningHours, getSettings } from "@/lib/server/settings";
 import { toTelHref } from "@/lib/config/business";
+import { JsonLd } from "@/components/site/JsonLd";
+import { restaurantLd } from "@/lib/server/structured-data";
 
 const STEPS = [
   { t: "Choose your dishes", d: "Browse the menu and add what you'd like. Pick your spice level where it applies." },
@@ -22,6 +24,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <JsonLd data={restaurantLd(settings, hours)} />
       <Hero pickupArea={settings.pickupArea} acceptingOrders={settings.acceptingOrders} />
 
       {/* Signature dishes */}

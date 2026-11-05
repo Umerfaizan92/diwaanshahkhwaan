@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useCart } from "@/lib/client/cart-store";
 import { formatCents } from "@/lib/domain/money";
 
@@ -39,19 +38,14 @@ export function CartButton({ tone = "solid" }: { tone?: "solid" | "overlay" }) {
 export function FloatingCart() {
   const items = useCart();
   const pathname = usePathname();
-  const reduce = useReducedMotion();
   const count = items.reduce((s, i) => s + i.quantity, 0);
   const total = items.reduce((s, i) => s + i.quantity * i.unitPriceHintCents, 0);
   const hidden = pathname.startsWith("/cart") || pathname.startsWith("/checkout") || pathname.startsWith("/order") || pathname.startsWith("/pay");
   return (
-    <AnimatePresence>
+    <>
       {count > 0 && !hidden && (
-        <motion.div
-          initial={reduce ? false : { y: 80, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={reduce ? { opacity: 0 } : { y: 80, opacity: 0 }}
-          transition={{ type: "spring", stiffness: 380, damping: 32 }}
-          className="no-print fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-30 sm:left-auto sm:right-6 sm:w-auto"
+        <div
+          className="pop-up no-print fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-30 sm:left-auto sm:right-6 sm:w-auto"
         >
           <Link
             href="/cart"
@@ -65,8 +59,8 @@ export function FloatingCart() {
             </span>
             <span className="ml-auto font-semibold tabular-nums sm:ml-3">{formatCents(total)}</span>
           </Link>
-        </motion.div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 }

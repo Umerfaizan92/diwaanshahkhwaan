@@ -1,5 +1,10 @@
 import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
+
+// Self-hosted and preloaded; size-adjusted fallbacks avoid layout shift while they load
+const cinzel = localFont({ src: "../fonts/cinzel.woff2", variable: "--font-cinzel", weight: "400 900", display: "swap", fallback: ["Georgia", "serif"] });
+const figtree = localFont({ src: "../fonts/figtree.woff2", variable: "--font-figtree", weight: "300 900", display: "swap", fallback: ["system-ui", "sans-serif"] });
 
 const APP_URL = process.env.APP_URL ?? "http://localhost:3000";
 
@@ -35,7 +40,7 @@ const themeScript = `try{var t=localStorage.getItem('dsk-theme');if(t==='light')
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-AU" suppressHydrationWarning>
+    <html lang="en-AU" suppressHydrationWarning className={`${cinzel.variable} ${figtree.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>

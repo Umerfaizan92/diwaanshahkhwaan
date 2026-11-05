@@ -22,7 +22,7 @@ export default async function CustomersPage({ searchParams }: PageProps<"/admin/
         <button className={buttonClass("ghost", "md")}>Search</button>
       </form>
       <Panel>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Scrollable table">
           <table className="w-full min-w-[40rem] text-sm">
             <thead>
               <tr className="border-b border-line text-left text-muted">

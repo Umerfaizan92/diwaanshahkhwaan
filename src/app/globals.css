@@ -1,18 +1,5 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: "Cinzel";
-  src: url("../fonts/cinzel.woff2") format("woff2");
-  font-weight: 400 900;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Figtree";
-  src: url("../fonts/figtree.woff2") format("woff2");
-  font-weight: 300 900;
-  font-display: swap;
-}
-
 /* ---------- Design tokens ---------- */
 :root {
   color-scheme: dark;
@@ -69,8 +56,8 @@
   --color-success: var(--success);
   --color-danger: var(--danger);
   --color-warning: var(--warning);
-  --font-display: "Cinzel", "Trajan Pro", Georgia, serif;
-  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-cinzel), "Trajan Pro", Georgia, serif;
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
 }
 
 /* ---------- Base ---------- */
@@ -180,5 +167,119 @@ a {
   body {
     background: #fff;
     color: #000;
+  }
+}
+
+/* ---------- Motion (CSS-only so it runs before JavaScript loads) ---------- */
+@keyframes hero-push {
+  from {
+    transform: scale(1.12);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes arch-draw {
+  from {
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.7;
+  }
+  to {
+    stroke-dashoffset: 0;
+    opacity: 0.7;
+  }
+}
+@keyframes rise {
+  from {
+    transform: translateY(14px);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes pop-up {
+  from {
+    opacity: 0;
+    transform: translateY(80px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.hero-push {
+  animation: hero-push 9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.arch-draw {
+  stroke-dasharray: 1;
+  animation: arch-draw 2.2s cubic-bezier(0.65, 0, 0.35, 1) 0.3s both;
+}
+/* Transform-only entrance: text is visible (and counts for LCP) from the first paint */
+.rise {
+  animation: rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.fade-in {
+  animation: fade-in 0.6s ease both;
+}
+.slide-in {
+  animation: slide-in 0.28s ease-out both;
+}
+.drop-in {
+  animation: drop-in 0.2s ease-out both;
+}
+.pop-up {
+  animation: pop-up 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.parallax {
+  transform: translate3d(0, var(--parallax, 0px), 0);
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-push,
+  .arch-draw,
+  .rise,
+  .fade-in,
+  .slide-in,
+  .drop-in,
+  .pop-up {
+    animation: none !important;
+  }
+  .arch-draw {
+    stroke-dasharray: none;
+    opacity: 0.7;
+  }
+  .parallax {
+    transform: none !important;
   }
 }

@@ -10,6 +10,8 @@ import { DAY_NAMES } from "@/lib/domain/hours";
 import { getDishBySlug } from "@/lib/server/menu";
 import { getSettings } from "@/lib/server/settings";
 import { toTelHref } from "@/lib/config/business";
+import { JsonLd } from "@/components/site/JsonLd";
+import { dishLd } from "@/lib/server/structured-data";
 
 export async function generateMetadata({ params }: PageProps<"/menu/[slug]">): Promise<Metadata> {
   const { slug } = await params;
@@ -31,6 +33,7 @@ export default async function DishPage({ params }: PageProps<"/menu/[slug]">) {
 
   return (
     <Container className="pb-10 pt-24 lg:pt-32">
+      <JsonLd data={dishLd(dish)} />
       <nav aria-label="Breadcrumb" className="mb-6 text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-1.5">
           <li>

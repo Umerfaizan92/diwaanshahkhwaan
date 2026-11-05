@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useId, useRef, useState, type KeyboardEvent } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { formatCentsShort } from "@/lib/domain/money";
 
 type Item = { slug: string; name: string; shortDescription: string; priceCents: number; isAvailable: boolean; portion: string | null };
@@ -11,7 +10,6 @@ type Cat = { slug: string; name: string; description: string | null; items: Item
 /** Tabbed category preview with animated transitions; a WAI-ARIA tabs pattern */
 export function MenuPreview({ categories }: { categories: Cat[] }) {
   const [active, setActive] = useState(0);
-  const reduce = useReducedMotion();
   const uid = useId();
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
   const cat = categories[active];
@@ -56,14 +54,7 @@ export function MenuPreview({ categories }: { categories: Cat[] }) {
       </div>
 
       <div role="tabpanel" id={`${uid}-panel`} aria-labelledby={`${uid}-tab-${active}`} className="min-h-[22rem]">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={cat.slug}
-            initial={reduce ? false : { opacity: 0, x: 18 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, x: -18 }}
-            transition={{ duration: 0.28, ease: "easeOut" }}
-          >
+        <div key={cat.slug} className="slide-in">
             {cat.description ? <p className="mb-5 max-w-prose text-muted">{cat.description}</p> : null}
             <ul className="divide-y divide-line/70 border-y border-line/70">
               {cat.items.map((d) => (
@@ -81,8 +72,7 @@ export function MenuPreview({ categories }: { categories: Cat[] }) {
                 </li>
               ))}
             </ul>
-          </motion.div>
-        </AnimatePresence>
+        </div>
       </div>
     </div>
   );

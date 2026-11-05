@@ -30,7 +30,7 @@ export default async function AuditPage({ searchParams }: PageProps<"/admin/audi
         <button className={buttonClass("ghost", "md")}>Filter</button>
       </form>
       <Panel>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Scrollable table">
           <table className="w-full min-w-[44rem] text-sm">
             <thead>
               <tr className="border-b border-line text-left text-muted">
