@@ -7,6 +7,7 @@ import { getDb, schema } from "@/lib/db";
 import { startStaffSession, verifyPassword, endStaffSession } from "@/lib/server/auth";
 import { audit } from "@/lib/server/audit";
 import { clientIp, rateLimit } from "@/lib/server/rate-limit";
+import { completeReset, completeSetup, requestResetCode, requestSetupCode, type AccessResult } from "@/lib/server/owner-access";
 
 const schemaIn = z.object({ email: z.string().trim().toLowerCase().max(200), password: z.string().min(1).max(200) });
 
@@ -33,4 +34,38 @@ export async function staffLogin(_prev: { error?: string; email?: string }, form
 export async function staffLogout() {
   await endStaffSession();
   redirect("/admin/login");
+}
+
+/* ---------------- Owner setup and password reset ---------------- */
+
+
+const slow = "Too many attempts. Wait 15 minutes and try again.";
+
+export async function ownerSetupRequestAction(input: { name: string; email: string; phone: string }): Promise<AccessResult> {
+  const ip = await clientIp();
+  if (!(await rateLimit(`owner-code-ip:${ip}`, 5, 900))) return { ok: false, error: slow };
+  if (!(await rateLimit(`owner-code-email:${String(input.email).toLowerCase()}`, 3, 900))) return { ok: false, error: slow };
+  return requestSetupCode(input);
+}
+
+export async function ownerSetupCompleteAction(input: { email: string; code: string; password: string; confirm: string }): Promise<AccessResult> {
+  const ip = await clientIp();
+  if (!(await rateLimit(`owner-verify-ip:${ip}`, 15, 900))) return { ok: false, error: slow };
+  const r = await completeSetup({ ...input, email: String(input.email).toLowerCase().trim() });
+  if (!r.ok || !r.staffId) return r;
+  await startStaffSession(r.staffId);
+  redirect("/admin");
+}
+
+export async function ownerResetRequestAction(input: { email: string }): Promise<AccessResult> {
+  const ip = await clientIp();
+  if (!(await rateLimit(`owner-code-ip:${ip}`, 5, 900))) return { ok: false, error: slow };
+  if (!(await rateLimit(`owner-code-email:${String(input.email).toLowerCase()}`, 3, 900))) return { ok: false, error: slow };
+  return requestResetCode({ email: String(input.email).toLowerCase().trim() });
+}
+
+export async function ownerResetCompleteAction(input: { email: string; code: string; password: string; confirm: string }): Promise<AccessResult> {
+  const ip = await clientIp();
+  if (!(await rateLimit(`owner-verify-ip:${ip}`, 15, 900))) return { ok: false, error: slow };
+  return completeReset({ ...input, email: String(input.email).toLowerCase().trim() });
 }

@@ -222,6 +222,25 @@ export const staffUsers = pgTable("staff_users", {
   updatedAt: updatedAt(),
 });
 
+/** One-time verification codes for first owner setup and password reset. Only a hash is stored. */
+export const ownerCodes = pgTable(
+  "owner_codes",
+  {
+    id: id(),
+    purpose: text("purpose", { enum: ["SETUP", "RESET"] }).notNull(),
+    email: text("email").notNull(),
+    name: text("name"),
+    phone: text("phone"),
+    staffId: text("staff_id").references(() => staffUsers.id, { onDelete: "cascade" }),
+    codeHash: text("code_hash").notNull(),
+    attempts: integer("attempts").notNull().default(0),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("owner_codes_email_idx").on(t.email, t.purpose)],
+);
+
 export const sessions = pgTable(
   "sessions",
   {

@@ -44,3 +44,17 @@ test("staff login is rate limited", async ({ page }) => {
   }
   await expect(page.locator("form [role=alert]")).toContainText("Too many sign-in attempts");
 });
+
+test("forgot password: link on sign-in, generic answer, strong password generator", async ({ page }) => {
+  await page.goto("/admin/login");
+  await page.getByRole("link", { name: "Forgot password?" }).click();
+  await expect(page).toHaveURL(/\/admin\/login\/forgot/);
+  await page.fill("#f-email", `nobody+${Date.now()}@example.com`);
+  await page.getByRole("button", { name: "Send reset code" }).click();
+  await expect(page.getByText(/If that email belongs to the owner account/)).toBeVisible();
+  await page.getByRole("button", { name: "Generate strong password" }).click();
+  const pw = await page.inputValue("#new-pw");
+  expect(pw.length).toBeGreaterThanOrEqual(16);
+  expect(await page.inputValue("#confirm-pw")).toBe(pw);
+  await expect(page.getByText("Strength: Strong")).toBeVisible();
+});
