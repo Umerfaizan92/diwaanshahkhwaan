@@ -11,7 +11,7 @@ Status key: ✅ done and verified · 🟡 in progress · ⬜ not started
 | 4 | Checkout and payments (test mode) | ✅ | 15 payment integration tests (success, duplicates, late webhook, reconcile, failure plus retry, cancel, expiry, late payment, amount mismatch, refunds incl. concurrency and provider failure, Stripe and demo signature checks, live-key guard); browser run: decline → retry → paid → receipt, cancel at payment page, account sign-up |
 | 5 | Owner dashboard and RBAC | ✅ | 9 admin integration tests (RBAC matrix, workflow rules, last-owner and self guards, session revocation, ABN checksum, reports, CSV injection guard, image re-encoding); browser: all 16 admin pages load with no console errors; kitchen role denied 6 restricted pages and the CSV export (403) |
 | 6 | Notifications | ✅ | 14 notification tests (queueing, dedupe on duplicate payments, scheduled reminders, SMS opt-in, reminder cancellation, per-refund emails, backoff retry, max attempts plus staff retry, permanent errors, crash lease recovery, 5 concurrent workers send each message once, owner switches, HTML escaping, all templates); browser: paid order → confirmation, owner alert and reminder logged; a real retry recovered a failed test email |
-| 7 | SEO, accessibility, legal, compliance | ⬜ | |
+| 7 | SEO, accessibility, legal, compliance | ✅ | 18 Playwright e2e tests (axe WCAG 2.2 AA on 17 public pages in both themes and 16 admin pages; no overflow at 320/375/768/1024/1440; reduced motion; keyboard; ordering, fulfilment and security flows); Lighthouse mobile: home 95, menu 92, dish 98, contact 100 performance; accessibility 100; best practices 100 |
 | 8 | Audit and readiness report | ⬜ | |
 
 ## Business facts captured
@@ -81,6 +81,15 @@ Status key: ✅ done and verified · 🟡 in progress · ⬜ not started
   controls: channel switches, owner alert address, reminder timing, test email, a delivery log with retry and
   cancel, and per-order message history with resend. Fixed: the test-email template crashed without an order;
   default pickup instructions contradicted the confirmation.
+
+- Phase 7: per-page metadata and canonicals, sitemap.xml (pages and dishes with images), robots.txt (blocks all
+  indexing unless `SITE_INDEXABLE=true`, so staging stays private), generated Open Graph image, JSON-LD (Restaurant
+  with locality only — no street address — plus opening hours and an order action; Menu with sections, items and AUD
+  offers; MenuItem and breadcrumbs; FAQPage). Performance: the always-loaded animation library was replaced with
+  CSS-only motion and LCP-friendly transform-only entrances (home TBT 990 ms → ~150 ms, performance score 57 → 95);
+  fonts are self-hosted, preloaded and size-adjusted via next/font; above-the-fold images are prioritised. Fixed
+  accessibility issues: date-button names, scrollable tables, heading order. Docs: COMPLIANCE.md (City of Gosnells
+  registration, Standard 3.2.2A, allergens, ABN/GST, consumer law, privacy, with sources) and OWNER_VERIFICATION.md.
 
 ## Unresolved issues / next steps
 
