@@ -46,7 +46,7 @@ export const CATALOG: SeedCategory[] = [
   {
     slug: "bbq-platters",
     name: "Signature Shahi BBQ Platters",
-    description: "Charcoal-kissed BBQ served with rice, fresh salad and our signature Shahi dip.",
+    description: "Smoky Shahi BBQ served with rice, fresh salad and our signature Shahi dip.",
     dishes: [
       {
         slug: "shahi-chicken-tikka-bbq-platter",

@@ -1,0 +1,63 @@
+import type { Metadata } from "next";
+import { DishCard } from "@/components/site/DishCard";
+import { Container, PageHeader } from "@/components/site/PageHeader";
+import { getPublicMenu } from "@/lib/server/menu";
+import { getSettings } from "@/lib/server/settings";
+
+export const metadata: Metadata = {
+  title: "Menu",
+  description: "Biryani, karahi, Shahi BBQ platters, savouries, vegetarian specials and desserts. Order ahead for pickup in Langford WA.",
+  alternates: { canonical: "/menu" },
+};
+
+export default async function MenuPage() {
+  const [menu, settings] = await Promise.all([getPublicMenu(), getSettings()]);
+  return (
+    <>
+      <PageHeader
+        title="Menu"
+        intro={
+          <>
+            Cooked fresh for each order. Choose your dishes, then pick a pickup time at checkout — we need at least{" "}
+            {settings.minNoticeHours} hours&apos; notice.
+          </>
+        }
+      />
+      <nav aria-label="Menu categories" className="sticky top-16 z-20 border-b border-line/60 bg-bg/90 backdrop-blur lg:top-[4.5rem]">
+        <Container>
+          <ul className="rail -mx-4 flex gap-1 overflow-x-auto px-4 py-2.5 sm:mx-0 sm:px-0">
+            {menu.map((c) => (
+              <li key={c.slug} className="shrink-0">
+                <a href={`#${c.slug}`} className="block rounded-full px-3.5 py-1.5 text-sm text-text/80 hover:bg-raised hover:text-gold">
+                  {c.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </nav>
+      <Container className="pt-10">
+        {menu.length === 0 ? (
+          <p className="py-20 text-center text-muted">The menu is being updated. Please check back soon or call us to order.</p>
+        ) : null}
+        {menu.map((c) => (
+          <section key={c.slug} id={c.slug} aria-labelledby={`h-${c.slug}`} className="scroll-mt-32 py-10 lg:scroll-mt-36">
+            <div className="mb-6 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b border-line/60 pb-4">
+              <h2 id={`h-${c.slug}`} className="font-display text-2xl font-semibold sm:text-3xl">
+                {c.name}
+              </h2>
+              {c.description ? <p className="text-muted">{c.description}</p> : null}
+            </div>
+            <ul className="grid grid-cols-2 gap-x-2 gap-y-4 sm:gap-x-3 md:grid-cols-3 lg:grid-cols-4">
+              {c.dishes.map((d) => (
+                <li key={d.id}>
+                  <DishCard dish={d} sizes="(min-width:1024px) 22vw, (min-width:768px) 30vw, 46vw" />
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </Container>
+    </>
+  );
+}
