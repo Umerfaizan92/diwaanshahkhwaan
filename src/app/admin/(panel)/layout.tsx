@@ -12,6 +12,7 @@ const NAV: (NavItem & { perm: Permission })[] = [
   { href: "/admin", label: "Overview", perm: "dashboard:view" },
   { href: "/admin/menu", label: "Menu", perm: "menu:availability" },
   { href: "/admin/categories", label: "Categories", perm: "menu:edit" },
+  { href: "/admin/schedule", label: "Pickup & capacity", perm: "schedule:edit" },
 ];
 
 export default async function AdminPanelLayout({ children }: { children: React.ReactNode }) {

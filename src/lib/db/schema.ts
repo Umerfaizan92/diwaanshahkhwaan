@@ -265,6 +265,9 @@ export const orders = pgTable(
     paidAt: timestamp("paid_at", { withTimezone: true }),
     trackingToken: text("tracking_token").notNull().unique(),
     smsOptIn: boolean("sms_opt_in").notNull().default(false),
+    /** Set when staff need to look at this order (e.g. paid after its hold expired and the slot is now over capacity) */
+    attentionReason: text("attention_reason"),
+    cancelReason: text("cancel_reason"),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
