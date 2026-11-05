@@ -94,7 +94,7 @@ export function PickupPicker({ lines, value, onChange, error, refreshKey }: { li
         <p id={`${uid}-dl`} className="mb-2 text-sm font-semibold">
           Pickup date
         </p>
-        <div role="group" aria-labelledby={`${uid}-dl`} className="rail -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+        <div role="group" aria-labelledby={`${uid}-dl`} className="grid grid-cols-4 gap-2 min-[420px]:grid-cols-5 sm:grid-cols-7">
           {visibleDays.map((d, i) => {
             const p = dayParts(d.date);
             const open = d.status === "open";
@@ -111,7 +111,7 @@ export function PickupPicker({ lines, value, onChange, error, refreshKey }: { li
                 title={open ? formatDateLong(d.date) : d.reason}
                 onKeyDown={(e) => onDateKey(e, i)}
                 onClick={() => setActiveDate(d.date)}
-                className={`relative flex w-16 shrink-0 flex-col items-center rounded-2xl border px-1 py-2.5 transition-colors ${
+                className={`relative flex min-w-0 flex-col items-center rounded-2xl border px-1 py-2.5 transition-colors ${
                   active ? "border-gold bg-gold text-gold-ink" : open ? "border-line bg-sunken hover:border-gold/70" : "cursor-not-allowed border-line/50 text-muted/60 line-through decoration-1"
                 }`}
               >

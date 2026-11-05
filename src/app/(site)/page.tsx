@@ -8,6 +8,7 @@ import { Container, SectionTitle } from "@/components/site/PageHeader";
 import { buttonClass } from "@/components/ui/Button";
 import { getFavouriteDishes, getPublicMenu } from "@/lib/server/menu";
 import { DishCarousel } from "@/components/site/DishCarousel";
+import { cardImage } from "@/lib/domain/images";
 import { getOpeningHours, getSettings } from "@/lib/server/settings";
 import { toTelHref } from "@/lib/config/business";
 import { JsonLd } from "@/components/site/JsonLd";
@@ -71,7 +72,7 @@ export default async function HomePage() {
             <div className="arch relative col-span-3 aspect-[3/4] overflow-hidden">
               <Image src="/images/dishes/tikka-skewers.webp" alt="Chicken tikka skewers being grilled over charcoal" fill sizes="(min-width:1024px) 28vw, 55vw" className="object-cover" />
             </div>
-            <div className="col-span-2 flex flex-col gap-3 pt-16">
+            <div className="col-span-2 flex flex-col gap-3 pt-8 sm:pt-16">
               <div className="relative aspect-square overflow-hidden rounded-2xl">
                 <Image src="/images/dishes/chicken-karahi.webp" alt="Chicken karahi with ginger and green chilli" fill sizes="(min-width:1024px) 18vw, 35vw" className="object-cover" />
               </div>
@@ -111,7 +112,7 @@ export default async function HomePage() {
               slug: c.slug,
               name: c.name,
               description: c.description,
-              items: c.dishes.map((d) => ({ slug: d.slug, name: d.name, shortDescription: d.shortDescription, priceCents: d.priceCents, isAvailable: d.isAvailable, portion: d.portion })),
+              items: c.dishes.map((d) => ({ slug: d.slug, name: d.name, shortDescription: d.shortDescription, priceCents: d.priceCents, isAvailable: d.isAvailable, portion: d.portion, image: cardImage(d.image) })),
             }))}
           />
         </Container>
@@ -128,7 +129,7 @@ export default async function HomePage() {
             We take large BBQ and bulk orders for gatherings of any size. Choose your chicken tikka, seekh kebab, beef or lamb
             tikka and quantities, and we&apos;ll tailor a feast to your occasion.
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <div className="mx-auto mt-8 grid max-w-sm gap-3 sm:flex sm:max-w-none sm:flex-wrap sm:justify-center [&>*]:w-full sm:[&>*]:w-auto">
             <Link href="/contact?topic=bulk" className={buttonClass("gold", "lg")}>
               Ask about a bulk order
             </Link>

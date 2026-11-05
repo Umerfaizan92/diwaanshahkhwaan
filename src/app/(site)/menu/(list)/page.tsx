@@ -5,6 +5,7 @@ import { getPublicMenu } from "@/lib/server/menu";
 import { getSettings } from "@/lib/server/settings";
 import { JsonLd } from "@/components/site/JsonLd";
 import { menuLd } from "@/lib/server/structured-data";
+import { CategoryJump } from "@/components/site/CategoryJump";
 
 export const metadata: Metadata = {
   title: "Menu",
@@ -27,12 +28,16 @@ export default async function MenuPage() {
           </>
         }
       />
-      <nav aria-label="Menu categories" className="sticky top-16 z-20 border-b border-line/60 bg-bg/90 backdrop-blur lg:top-[4.5rem]">
-        <Container>
-          <ul className="rail -mx-4 flex gap-1 overflow-x-auto px-4 py-2.5 sm:mx-0 sm:px-0">
+      {/* Categories: a dropdown on phones (no sideways scrolling), wrapped buttons on larger screens */}
+      <nav aria-label="Menu categories" className="sticky top-16 z-20 border-b border-line/60 bg-bg/95 backdrop-blur lg:top-[4.5rem]">
+        <Container className="py-2.5">
+          <div className="md:hidden">
+            <CategoryJump categories={menu.map((c) => ({ slug: c.slug, name: c.name }))} />
+          </div>
+          <ul className="hidden flex-wrap gap-1.5 md:flex">
             {menu.map((c) => (
-              <li key={c.slug} className="shrink-0">
-                <a href={`#${c.slug}`} className="block rounded-full px-3.5 py-1.5 text-sm text-text/80 hover:bg-raised hover:text-gold">
+              <li key={c.slug}>
+                <a href={`#${c.slug}`} className="block rounded-full border border-line px-3.5 py-1.5 text-sm text-text/85 transition-colors hover:border-gold hover:text-gold">
                   {c.name}
                 </a>
               </li>
@@ -40,6 +45,18 @@ export default async function MenuPage() {
           </ul>
         </Container>
       </nav>
+      {/* On phones, also show every category up front as a tidy grid */}
+      <Container className="pt-6 md:hidden">
+        <ul className="grid grid-cols-2 gap-2">
+          {menu.map((c) => (
+            <li key={c.slug}>
+              <a href={`#${c.slug}`} className="flex min-h-11 items-center justify-center rounded-xl border border-line bg-raised px-2 py-2 text-center text-[0.88rem] leading-tight text-text/90 hover:border-gold hover:text-gold">
+                {c.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </Container>
       <Container className="pt-10">
         {menu.length === 0 ? (
           <p className="py-20 text-center text-muted">The menu is being updated. Please check back soon or call us to order.</p>

@@ -56,7 +56,7 @@ export default async function OrderAheadPage() {
           ))}
         </dl>
 
-        <div className="mt-10 flex flex-wrap gap-3">
+        <div className="mt-10 grid max-w-sm gap-3 sm:flex sm:max-w-none sm:flex-wrap [&>*]:w-full sm:[&>*]:w-auto">
           <ButtonLink href="/menu" size="lg">
             Start your order
           </ButtonLink>

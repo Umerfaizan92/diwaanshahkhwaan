@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { HeroParallax } from "./HeroParallax";
 
@@ -42,36 +43,51 @@ export function Hero({ pickupArea, acceptingOrders }: { pickupArea: string; acce
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(10_7_5/0.72)_0%,rgb(10_7_5/0.45)_30%,rgb(10_7_5/0.82)_62%,rgb(10_7_5/0.96)_100%)] lg:bg-[linear-gradient(90deg,rgb(10_7_5/0.95)_0%,rgb(10_7_5/0.84)_40%,rgb(10_7_5/0.35)_75%,rgb(10_7_5/0.2)_100%)]" />
       </div>
 
-      <div className="mx-auto w-full max-w-7xl px-4 pb-14 pt-28 sm:px-6 lg:px-8 lg:pb-0">
-        <div className="relative max-w-xl">
-          <svg viewBox="0 0 400 520" className="pointer-events-none absolute -left-6 -top-6 hidden h-[calc(100%+6rem)] w-[calc(100%+3rem)] text-[#d9b45a] sm:block" fill="none" aria-hidden preserveAspectRatio="none">
-            <path className="arch-draw" pathLength={1} d="M8 516V190C8 118 76 80 124 60c32-13 52-24 76-52 24 28 44 39 76 52 48 20 116 58 116 130v326" stroke="currentColor" strokeWidth="1.25" vectorEffect="non-scaling-stroke" />
+      <div className="mx-auto w-full max-w-7xl px-4 pb-10 pt-24 sm:px-6 lg:px-8 lg:pb-0 lg:pt-28">
+        {/* Gold Mughal arch framing the wordmark: drawn inside the content box so nothing spills off-screen */}
+        <div className="relative w-full max-w-xl">
+          <svg viewBox="0 0 400 520" className="pointer-events-none absolute inset-0 h-full w-full text-[#d9b45a]" fill="none" aria-hidden preserveAspectRatio="none">
+            <path className="arch-draw" pathLength={1} d="M2 518V196C2 122 72 84 122 63c32-13 54-25 78-55 24 30 46 42 78 55 50 21 120 59 120 133v322" stroke="currentColor" strokeWidth="1.25" vectorEffect="non-scaling-stroke" />
           </svg>
-          <p className="hero-shadow fade-in relative font-display text-[clamp(0.85rem,2.6vw,1rem)] font-semibold tracking-wide text-[#f3d68a] [animation-delay:0.5s] sm:pl-4 sm:pt-28">
-            Home-cooked in {pickupArea.replace(/\s*WA.*$/, "")}, Perth
-          </p>
-          <h1 className="hero-shadow rise relative mt-3 font-display text-[clamp(2.4rem,9vw,4.75rem)] font-semibold leading-[1.02] text-[#fbf4e6] [animation-delay:0.2s] sm:pl-4">
-            <span className="gold-leaf">Diwaan</span>
-            <br />
-            Shah Khwaan
-          </h1>
-          <div className="rise relative [animation-delay:0.35s] sm:pl-4">
-            <p className="hero-shadow mt-5 max-w-md text-[clamp(1rem,3.6vw,1.25rem)] text-[#f7efe0]">
-              Royal flavours served with love. Biryani, karahi and Shahi BBQ platters, cooked fresh for your order and ready when you arrive.
+
+          {/* Logo at the crown of the arch, with steam rising from the handi */}
+          <div className="fade-in absolute left-1/2 top-[3.2rem] -translate-x-1/2 [animation-delay:0.6s] sm:top-[3.6rem]">
+            <div className="smoke" aria-hidden>
+              <span />
+              <span />
+              <span />
+              <span />
+            </div>
+            <Image src="/images/brand/emblem.png" alt="" width={84} height={84} priority className="relative size-16 rounded-full shadow-[0_0_28px_-4px_rgb(226_189_94/0.55)] ring-1 ring-[#d9b45a]/70 sm:size-20" />
+          </div>
+
+          <div className="relative px-5 pb-8 pt-[8.5rem] sm:px-9 sm:pb-12 sm:pt-[10rem]">
+            <p className="hero-shadow fade-in font-display text-[clamp(0.8rem,3.4vw,1rem)] font-semibold tracking-wide text-[#f3d68a] [animation-delay:0.5s]">
+              Home-cooked in {pickupArea.replace(/\s*WA.*$/, "")}, Perth
             </p>
-            <div className="mt-8 flex flex-wrap gap-3 pb-2 sm:pb-12">
-              <Link
-                href="/menu"
-                className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#e2bd5e] px-6 text-base font-semibold text-[#1a1209] shadow-[0_10px_30px_-12px_#e2bd5e] transition-colors hover:bg-[#f0d07a] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f3d68a]"
-              >
-                {acceptingOrders ? "Order for pickup" : "See the menu"}
-              </Link>
-              <Link
-                href="/order-ahead"
-                className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#f3d68a]/80 bg-black/40 px-6 text-base font-semibold text-[#fbf4e6] backdrop-blur-sm transition-colors hover:bg-black/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f3d68a]"
-              >
-                How ordering works
-              </Link>
+            <h1 className="hero-shadow rise mt-3 font-display text-[clamp(2.1rem,10vw,4.75rem)] font-semibold leading-[1.02] text-[#fbf4e6] [animation-delay:0.2s]">
+              <span className="gold-leaf">Diwaan</span>
+              <br />
+              Shah Khwaan
+            </h1>
+            <div className="rise [animation-delay:0.35s]">
+              <p className="hero-shadow mt-5 max-w-md text-[clamp(0.98rem,3.8vw,1.25rem)] text-[#f7efe0]">
+                Royal flavours served with love. Biryani, karahi and Shahi BBQ platters, cooked fresh for your order and ready when you arrive.
+              </p>
+              <div className="mt-7 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
+                <Link
+                  href="/menu"
+                  className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#e2bd5e] px-2 text-center text-[clamp(0.82rem,3.6vw,0.95rem)] leading-tight sm:w-auto sm:min-w-[13rem] sm:px-6 sm:text-base font-semibold text-[#1a1209] shadow-[0_10px_30px_-12px_#e2bd5e] transition-colors hover:bg-[#f0d07a] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f3d68a]"
+                >
+                  {acceptingOrders ? "Order for pickup" : "See the menu"}
+                </Link>
+                <Link
+                  href="/order-ahead"
+                  className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-[#f3d68a]/80 bg-black/40 px-2 text-center text-[clamp(0.82rem,3.6vw,0.95rem)] leading-tight sm:w-auto sm:min-w-[13rem] sm:px-6 sm:text-base font-semibold text-[#fbf4e6] backdrop-blur-sm transition-colors hover:bg-black/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f3d68a]"
+                >
+                  How ordering works
+                </Link>
+              </div>
             </div>
           </div>
         </div>

@@ -39,7 +39,7 @@ export default function AboutPage() {
             We take large BBQ and bulk orders for gatherings. Choose your chicken tikka, seekh kebab, and beef or lamb tikka
             and quantities, and we&apos;ll put together a feast for your occasion.
           </p>
-          <div className="flex flex-wrap gap-3 pt-2">
+          <div className="grid max-w-sm gap-3 pt-2 sm:flex sm:max-w-none sm:flex-wrap [&>*]:w-full sm:[&>*]:w-auto">
             <ButtonLink href="/menu">See the menu</ButtonLink>
             <ButtonLink href="/contact?topic=bulk" variant="outline">
               Ask about a bulk order

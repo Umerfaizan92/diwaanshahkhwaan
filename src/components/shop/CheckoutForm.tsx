@@ -12,6 +12,7 @@ import { Button, buttonClass } from "@/components/ui/Button";
 import { useServerQuote } from "./CartView";
 import { PickupPicker } from "./PickupPicker";
 import { OrderTotals } from "./OrderTotals";
+import { CardMarks, CashIcon, CardIcon, LockIcon, SecurityPoints } from "./PaymentBadges";
 
 type Prefill = { name: string; email: string; phone: string } | null;
 
@@ -174,33 +175,44 @@ export function CheckoutForm({
           </div>
         </section>
 
-        <fieldset className="min-w-0 space-y-3">
-          <legend className="mb-4 font-display text-2xl">3. Payment</legend>
+        <fieldset className="min-w-0 space-y-4">
+          <legend className="mb-4 flex w-full flex-wrap items-center justify-between gap-2 font-display text-2xl">
+            3. Payment
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-success/40 bg-success/10 px-3 py-1 font-sans text-xs font-semibold text-success">
+              <LockIcon className="size-4" /> Secure checkout
+            </span>
+          </legend>
           {errors.paymentMethod ? <p className="text-sm font-medium text-danger">{errors.paymentMethod}</p> : null}
           <div className="grid gap-3 sm:grid-cols-2">
             {acceptCard ? (
-              <label className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition-colors ${method === "CARD" ? "border-gold bg-gold/10" : "border-line bg-raised hover:border-gold/60"}`}>
-                <input type="radio" name="paymentMethod" value="CARD" checked={method === "CARD"} onChange={() => setMethod("CARD")} className="mt-1 size-4 accent-[var(--gold)]" />
-                <span>
-                  <span className="block font-semibold">Pay by card now</span>
-                  <span className="mt-0.5 block text-sm text-muted">Visa, Mastercard, Amex, Apple Pay or Google Pay on Stripe&apos;s secure, encrypted checkout. Paid straight to our bank account.</span>
+              <label className={`relative flex cursor-pointer flex-col gap-3 rounded-2xl border-2 p-4 transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus ${method === "CARD" ? "border-gold bg-gold/10" : "border-line bg-raised hover:border-gold/60"}`}>
+                <span className="flex items-start gap-3">
+                  <input type="radio" name="paymentMethod" value="CARD" checked={method === "CARD"} onChange={() => setMethod("CARD")} className="mt-1 size-4 accent-[var(--gold)]" />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-2 font-semibold">
+                      <CardIcon className="size-5 text-gold" /> Pay by card now
+                    </span>
+                    <span className="mt-1 block text-sm text-muted">Debit or credit card, Apple Pay or Google Pay on Stripe&apos;s encrypted checkout.</span>
+                  </span>
                 </span>
+                <CardMarks className="pl-7" />
               </label>
             ) : null}
             {acceptCash ? (
-              <label className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition-colors ${method === "CASH" ? "border-gold bg-gold/10" : "border-line bg-raised hover:border-gold/60"}`}>
-                <input type="radio" name="paymentMethod" value="CASH" checked={method === "CASH"} onChange={() => setMethod("CASH")} className="mt-1 size-4 accent-[var(--gold)]" />
-                <span>
-                  <span className="block font-semibold">Cash at pickup</span>
-                  <span className="mt-0.5 block text-sm text-muted">Your order is booked straight away. Please bring the exact amount if you can.</span>
+              <label className={`relative flex cursor-pointer flex-col gap-3 rounded-2xl border-2 p-4 transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus ${method === "CASH" ? "border-gold bg-gold/10" : "border-line bg-raised hover:border-gold/60"}`}>
+                <span className="flex items-start gap-3">
+                  <input type="radio" name="paymentMethod" value="CASH" checked={method === "CASH"} onChange={() => setMethod("CASH")} className="mt-1 size-4 accent-[var(--gold)]" />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-2 font-semibold">
+                      <CashIcon className="size-5 text-gold" /> Cash at pickup
+                    </span>
+                    <span className="mt-1 block text-sm text-muted">Your order is booked straight away. Please bring the exact amount if you can.</span>
+                  </span>
                 </span>
               </label>
             ) : null}
           </div>
-          <p className="flex items-center gap-2 text-sm text-muted">
-            <svg viewBox="0 0 16 16" className="size-4 shrink-0 text-success" aria-hidden><path d="M8 1 2 3.5V8c0 3.3 2.6 6.2 6 7 3.4-.8 6-3.7 6-7V3.5L8 1Z" fill="currentColor" opacity=".25" /><path d="m5 8 2 2 4-4" stroke="currentColor" strokeWidth="1.6" fill="none" /></svg>
-            Card details are entered only on Stripe&apos;s PCI-DSS certified page. We never see or store them.
-          </p>
+          {method === "CARD" ? <SecurityPoints /> : null}
         </fieldset>
       </div>
 
@@ -248,7 +260,16 @@ export function CheckoutForm({
         <Button type="submit" size="lg" className="mt-5 w-full" disabled={pending || !quote || cartBlocked}>
           {method === "CASH" ? (pending ? "Placing your order…" : `Place order · pay ${quote ? formatCents(quote.totalCents) : ""} at pickup`) : pending ? "Holding your time…" : `Pay ${quote ? formatCents(quote.totalCents) : ""} securely`}
         </Button>
-        <p className="mt-3 text-center text-xs text-muted">{method === "CASH" ? "You'll get a confirmation and receipt by email straight away." : "Next, you'll pay on Stripe's secure checkout page. We never see your card details."}</p>
+        {method === "CASH" ? (
+          <p className="mt-3 text-center text-xs text-muted">You&apos;ll get a confirmation and receipt by email straight away.</p>
+        ) : (
+          <div className="mt-3 space-y-2 text-center">
+            <p className="flex items-center justify-center gap-1.5 text-xs text-muted">
+              <LockIcon className="size-4 text-success" /> Encrypted payment powered by Stripe
+            </p>
+            <CardMarks className="justify-center" />
+          </div>
+        )}
         <Link href="/cart" className="mt-3 block text-center text-sm text-muted underline">
           Edit order
         </Link>

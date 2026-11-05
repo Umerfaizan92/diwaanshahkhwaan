@@ -8,7 +8,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
  * - Pauses on hover, focus, touch and when off-screen; never auto-plays with reduced motion
  * - Visible pause/play control (WCAG 2.2.2) and previous/next buttons
  */
-export function DishCarousel({ children, label, interval = 4000 }: { children: ReactNode[]; label: string; interval?: number }) {
+export function DishCarousel({ children, label, interval = 2500 }: { children: ReactNode[]; label: string; interval?: number }) {
   const track = useRef<HTMLUListElement>(null);
   const [playing, setPlaying] = useState(true);
   const [hold, setHold] = useState(false);

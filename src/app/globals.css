@@ -142,6 +142,52 @@ a {
   text-shadow: none;
 }
 
+/* Steam rising from the logo's handi */
+.smoke {
+  position: absolute;
+  left: 50%;
+  top: 6%;
+  width: 0;
+  height: 0;
+}
+.smoke span {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 248 235 / 0.75) 0%, rgb(255 248 235 / 0.25) 45%, transparent 70%);
+  filter: blur(3px);
+  opacity: 0;
+  animation: smoke 3.6s ease-out infinite;
+}
+.smoke span:nth-child(2) {
+  animation-delay: 0.9s;
+  --dx: -14px;
+}
+.smoke span:nth-child(3) {
+  animation-delay: 1.8s;
+  --dx: 12px;
+}
+.smoke span:nth-child(4) {
+  animation-delay: 2.7s;
+  --dx: -4px;
+}
+@keyframes smoke {
+  0% {
+    transform: translate(-50%, 0) scale(0.5);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--dx, 8px)), -78px) scale(3);
+    opacity: 0;
+  }
+}
+
 /* Hero slideshow: each slide fades in, pushes in slowly, then hands over */
 .hero-slide {
   opacity: 0;
@@ -327,6 +373,9 @@ a {
   }
   .hero-slide:first-child {
     opacity: 1;
+  }
+  .smoke {
+    display: none;
   }
   .hero-push,
   .arch-draw,

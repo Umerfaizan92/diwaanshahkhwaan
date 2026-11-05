@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 export function PageHeader({ title, intro, children }: { title: string; intro?: ReactNode; children?: ReactNode }) {
   return (
     <section className="relative overflow-hidden border-b border-line/60 bg-sunken pb-10 pt-28 lg:pb-14 lg:pt-36">
-      <svg viewBox="0 0 400 300" aria-hidden className="pointer-events-none absolute -right-16 bottom-0 h-[130%] text-gold/15" fill="none" preserveAspectRatio="xMaxYMax meet">
+      <svg viewBox="0 0 400 300" aria-hidden className="pointer-events-none absolute -right-16 bottom-0 hidden h-[130%] text-gold/15 sm:block" fill="none" preserveAspectRatio="xMaxYMax meet">
         <path d="M8 300V160C8 100 76 70 124 52c32-12 52-22 76-48 24 26 44 36 76 48 48 18 116 48 116 108v140" stroke="currentColor" strokeWidth="1.5" />
         <path d="M48 300V170c0-46 50-70 86-84 26-10 46-20 66-42 20 22 40 32 66 42 36 14 86 38 86 84v130" stroke="currentColor" strokeWidth="1" />
       </svg>
