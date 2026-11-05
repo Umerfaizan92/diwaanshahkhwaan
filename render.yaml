@@ -15,9 +15,10 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "22"
-      # Keep the free 512MB instance well inside its memory limit
+      # Builds need a bigger heap (type checking); the running server is capped at 256MB
+      # in the start:render script so the free 512MB instance stays well inside its limit
       - key: NODE_OPTIONS
-        value: "--max-old-space-size=256"
+        value: "--max-old-space-size=1536"
       - key: MALLOC_ARENA_MAX
         value: "2"
       - key: DATABASE_URL
