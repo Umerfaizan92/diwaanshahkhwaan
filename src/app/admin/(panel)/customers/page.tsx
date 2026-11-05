@@ -17,12 +17,12 @@ export default async function CustomersPage({ searchParams }: PageProps<"/admin/
   return (
     <>
       <AdminHeader title="Customers" intro="Everyone who has placed a paid order." />
-      <form action="/admin/customers" className="mb-4 flex gap-2">
-        <input name="q" defaultValue={q} placeholder="Search name, email or phone" aria-label="Search customers" className="h-10 w-72 rounded-lg border border-line bg-sunken px-3" />
+      <form action="/admin/customers" className="mb-4 flex flex-wrap gap-2">
+        <input name="q" defaultValue={q} placeholder="Search name, email or phone" aria-label="Search customers" className="h-10 w-full rounded-lg sm:w-72 border border-line bg-sunken px-3" />
         <button className={buttonClass("ghost", "md")}>Search</button>
       </form>
       <Panel>
-        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Scrollable table">
+        <div className="relative overflow-x-auto" tabIndex={0} role="region" aria-label="Scrollable table">
           <table className="w-full min-w-[40rem] text-sm">
             <thead>
               <tr className="border-b border-line text-left text-muted">

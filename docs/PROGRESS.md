@@ -12,7 +12,7 @@ Status key: ✅ done and verified · 🟡 in progress · ⬜ not started
 | 5 | Owner dashboard and RBAC | ✅ | 9 admin integration tests (RBAC matrix, workflow rules, last-owner and self guards, session revocation, ABN checksum, reports, CSV injection guard, image re-encoding); browser: all 16 admin pages load with no console errors; kitchen role denied 6 restricted pages and the CSV export (403) |
 | 6 | Notifications | ✅ | 14 notification tests (queueing, dedupe on duplicate payments, scheduled reminders, SMS opt-in, reminder cancellation, per-refund emails, backoff retry, max attempts plus staff retry, permanent errors, crash lease recovery, 5 concurrent workers send each message once, owner switches, HTML escaping, all templates); browser: paid order → confirmation, owner alert and reminder logged; a real retry recovered a failed test email |
 | 7 | SEO, accessibility, legal, compliance | ✅ | 18 Playwright e2e tests (axe WCAG 2.2 AA on 17 public pages in both themes and 16 admin pages; no overflow at 320/375/768/1024/1440; reduced motion; keyboard; ordering, fulfilment and security flows); Lighthouse mobile: home 95, menu 92, dish 98, contact 100 performance; accessibility 100; best practices 100 |
-| 8 | Audit and readiness report | ⬜ | |
+| 8 | Audit and readiness report | ✅ | 90 unit/integration tests + 20 e2e tests (production build with CSP); link crawl 0 broken; fresh-DB migration and idempotent seed; see READINESS_REPORT.md |
 
 ## Business facts captured
 
@@ -91,6 +91,11 @@ Status key: ✅ done and verified · 🟡 in progress · ⬜ not started
   accessibility issues: date-button names, scrollable tables, heading order. Docs: COMPLIANCE.md (City of Gosnells
   registration, Standard 3.2.2A, allergens, ABN/GST, consumer law, privacy, with sources) and OWNER_VERIFICATION.md.
 
+- Phase 8: independent audit (see READINESS_REPORT.md), 13 issues found and fixed; Render blueprint; health check;
+  boot-time configuration validation; production CSP; test-mode ribbon; housekeeping; README.
+
 ## Unresolved issues / next steps
 
-See `OWNER_VERIFICATION.md` (created in Phase 7) for everything the owner must confirm.
+- Deployment to Render staging needs: (1) the Render connector connected to Claude or a Render login, and (2) a new
+  empty GitHub repo (`diwaanshahkhwaan`) with working GitHub access from this workspace.
+- Owner items: `OWNER_VERIFICATION.md`. Regulatory items: `COMPLIANCE.md`. Go-live blockers: `READINESS_REPORT.md`.

@@ -25,12 +25,12 @@ export default async function AuditPage({ searchParams }: PageProps<"/admin/audi
   return (
     <>
       <AdminHeader title="Audit log" intro="Every sign-in and change made in the dashboard, plus payment issues. Entries can't be edited." />
-      <form action="/admin/audit" className="mb-4 flex gap-2">
-        <input name="q" defaultValue={q} placeholder="Filter by action, e.g. refund, menu, staff" aria-label="Filter by action" className="h-10 w-80 rounded-lg border border-line bg-sunken px-3" />
+      <form action="/admin/audit" className="mb-4 flex flex-wrap gap-2">
+        <input name="q" defaultValue={q} placeholder="Filter by action, e.g. refund, menu, staff" aria-label="Filter by action" className="h-10 w-full rounded-lg sm:w-80 border border-line bg-sunken px-3" />
         <button className={buttonClass("ghost", "md")}>Filter</button>
       </form>
       <Panel>
-        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Scrollable table">
+        <div className="relative overflow-x-auto" tabIndex={0} role="region" aria-label="Scrollable table">
           <table className="w-full min-w-[44rem] text-sm">
             <thead>
               <tr className="border-b border-line text-left text-muted">

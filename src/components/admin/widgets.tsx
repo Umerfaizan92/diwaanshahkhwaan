@@ -383,7 +383,7 @@ export function TestEmailForm({ defaultTo }: { defaultTo: string }) {
     <div className="space-y-2">
       <Msg msg={msg} />
       <div className="flex flex-wrap gap-2">
-        <input aria-label="Send a test email to" type="email" value={to} onChange={(e) => setTo(e.target.value)} className="h-10 w-72 rounded-lg border border-line bg-sunken px-3" placeholder="you@example.com" />
+        <input aria-label="Send a test email to" type="email" value={to} onChange={(e) => setTo(e.target.value)} className="h-10 w-full sm:w-72 rounded-lg border border-line bg-sunken px-3" placeholder="you@example.com" />
         <Button variant="outline" disabled={pending || !to} onClick={() => run(() => sendTestEmailAction(to))}>
           Send test email
         </Button>

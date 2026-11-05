@@ -1,0 +1,53 @@
+# Render Blueprint for Diwaan Shah Khwaan — a NEW, separate project.
+# It creates its own web service and its own Postgres database. It does not touch
+# any other Render service. Payments run in TEST mode (built-in demo provider) until
+# the owner adds Stripe test keys, and live payments additionally need ALLOW_LIVE_PAYMENTS=true.
+services:
+  - type: web
+    name: diwaanshahkhwaan
+    runtime: node
+    region: singapore # closest Render region to Perth
+    plan: starter # "free" also works for testing, but it sleeps when idle (pauses reminders and hold expiry)
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start:render # applies migrations + idempotent seed, then starts
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: diwaanshahkhwaan-db
+          property: connectionString
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: DEMO_PAYMENT_SECRET
+        generateValue: true
+      - key: CRON_SECRET
+        generateValue: true
+      - key: PAYMENT_PROVIDER
+        value: demo
+      - key: ALLOW_LIVE_PAYMENTS
+        value: "false"
+      - key: SITE_INDEXABLE
+        value: "false"
+      - key: IN_PROCESS_WORKER
+        value: "true"
+      - key: EMAIL_PROVIDER
+        value: console
+      - key: SMS_PROVIDER
+        value: none
+      - key: SEED_OWNER_EMAIL
+        sync: false # set in the Render dashboard
+      - key: SEED_OWNER_PASSWORD
+        sync: false # set in the Render dashboard (12+ characters)
+      # Optional, set later in the dashboard: APP_URL (custom domain), STRIPE_SECRET_KEY,
+      # STRIPE_WEBHOOK_SECRET, RESEND_API_KEY, EMAIL_FROM, TWILIO_* (see .env.example)
+
+databases:
+  - name: diwaanshahkhwaan-db
+    databaseName: diwaanshahkhwaan
+    user: dsk
+    region: singapore
+    plan: basic-256mb
+    postgresMajorVersion: "16"

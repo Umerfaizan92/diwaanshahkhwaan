@@ -15,7 +15,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "render:predeploy": "tsx scripts/migrate.ts && tsx scripts/seed.ts"
+    "render:predeploy": "tsx scripts/migrate.ts && tsx scripts/seed.ts",
+    "start:render": "tsx scripts/migrate.ts && tsx scripts/seed.ts && next start -p ${PORT:-10000}"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

@@ -11,8 +11,8 @@ import { expireStaleHolds, transitionOrder } from "./orders";
 import { audit } from "./audit";
 import { notifyOrder } from "./notifications";
 import type { StaffUser } from "./auth";
+import { appUrl } from "@/lib/config/app-url";
 
-const appUrl = () => (process.env.APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
 
 export function orderUrl(order: Pick<Order, "reference" | "trackingToken">, extra = "") {
   return `${appUrl()}/order/${order.reference}?t=${order.trackingToken}${extra}`;

@@ -6,7 +6,6 @@ import {
   boolean,
   timestamp,
   jsonb,
-  serial,
   index,
   uniqueIndex,
   customType,
@@ -229,15 +228,6 @@ export const sessions = pgTable(
   (t) => [index("sessions_subject_idx").on(t.subjectId)],
 );
 
-export const loginAttempts = pgTable(
-  "login_attempts",
-  {
-    id: serial("id").primaryKey(),
-    key: text("key").notNull(),
-    at: timestamp("at", { withTimezone: true }).notNull().defaultNow(),
-  },
-  (t) => [index("login_attempts_key_at_idx").on(t.key, t.at)],
-);
 
 /* ---------------- Orders & payments ---------------- */
 

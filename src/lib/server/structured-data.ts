@@ -1,8 +1,9 @@
 import "server-only";
 import type { BusinessSettings, OpeningHours } from "@/lib/db/schema";
 import type { PublicCategory, PublicDish } from "./menu";
+import { appUrl } from "@/lib/config/app-url";
 
-const base = () => (process.env.APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
+const base = appUrl;
 const DAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const price = (c: number) => (c / 100).toFixed(2);
 

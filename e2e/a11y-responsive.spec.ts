@@ -66,3 +66,21 @@ test("keyboard: skip link and menu tabs", async ({ page }) => {
   await expect(page.getByRole("tab").nth(1)).toBeFocused();
   await expect(page.getByRole("tab").nth(1)).toHaveAttribute("aria-selected", "true");
 });
+
+test("admin pages fit a phone screen", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  await staffLogin(page);
+  const overflow: string[] = [];
+  for (const path of ["/admin", "/admin/orders", "/admin/production", "/admin/menu", "/admin/categories", "/admin/media", "/admin/schedule", "/admin/payments", "/admin/customers", "/admin/reports", "/admin/messages", "/admin/notifications", "/admin/settings", "/admin/staff", "/admin/audit", "/admin/menu/new"]) {
+    await page.goto(path, { waitUntil: "networkidle" });
+    const o = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    if (o > 0) overflow.push(`${path} +${o}px`);
+  }
+  expect(overflow).toEqual([]);
+});
+
+test("health check reports ready", async ({ request }) => {
+  const r = await request.get("/api/health");
+  expect(r.status()).toBe(200);
+  expect(await r.json()).toMatchObject({ status: "ok", db: "ok", seeded: true });
+});

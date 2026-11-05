@@ -78,7 +78,7 @@ export default async function NotificationsPage({ searchParams }: PageProps<"/ad
         ))}
       </nav>
       <Panel title="Delivery log">
-        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Scrollable table">
+        <div className="relative overflow-x-auto" tabIndex={0} role="region" aria-label="Scrollable table">
           <table className="w-full min-w-[48rem] text-sm">
             <thead>
               <tr className="border-b border-line text-left text-muted">

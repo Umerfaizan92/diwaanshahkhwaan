@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
 import { getPublicMenu } from "@/lib/server/menu";
+import { appUrl } from "@/lib/config/app-url";
 
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = (process.env.APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
+  const base = appUrl();
   const now = new Date();
   const pages: [string, number, MetadataRoute.Sitemap[number]["changeFrequency"]][] = [
     ["/", 1, "weekly"],

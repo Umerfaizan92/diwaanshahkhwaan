@@ -6,7 +6,7 @@ test("guest orders, pays (test mode), tracks and owner fulfils it", async ({ pag
   await fillCheckout(page);
   await page.getByRole("button", { name: /^Pay/ }).click();
   await page.waitForURL(/\/pay\/demo\//);
-  await expect(page.getByText("TEST MODE")).toBeVisible();
+  await expect(page.getByText(/simulated payment page/)).toBeVisible();
   await page.getByRole("button", { name: /^Pay \$/ }).click();
   await expect(page.getByRole("heading", { name: /Thank you/ })).toBeVisible();
   const ref = page.url().match(/DSK-[A-Z2-9]{6}/)![0];

@@ -48,7 +48,7 @@ export default async function PaymentsPage({ searchParams }: PageProps<"/admin/p
         ))}
       </nav>
       <Panel>
-        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Scrollable table">
+        <div className="relative overflow-x-auto" tabIndex={0} role="region" aria-label="Scrollable table">
           <table className="w-full min-w-[44rem] text-sm">
             <thead>
               <tr className="border-b border-line text-left text-muted">

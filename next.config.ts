@@ -8,6 +8,23 @@ const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
 ];
 
+// Production Content-Security-Policy. Next.js inline bootstrap scripts need 'unsafe-inline';
+// everything else is locked to this origin. Stripe Checkout is a full-page redirect, not an embed.
+const csp = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob:",
+  "font-src 'self'",
+  "connect-src 'self'",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "form-action 'self' https://checkout.stripe.com",
+  "object-src 'none'",
+  ...((process.env.APP_URL || process.env.RENDER_EXTERNAL_URL || "").startsWith("https://") ? ["upgrade-insecure-requests"] : []),
+].join("; ");
+if (process.env.NODE_ENV === "production" && process.env.DISABLE_CSP !== "true") securityHeaders.push({ key: "Content-Security-Policy", value: csp });
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   serverExternalPackages: ["pg", "sharp"],

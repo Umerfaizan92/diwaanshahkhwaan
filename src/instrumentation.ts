@@ -4,6 +4,13 @@
  */
 export async function register() {
   if (process.env.NEXT_RUNTIME !== "nodejs") return;
+  const { checkEnv } = await import("./lib/server/env");
+  const report = checkEnv();
+  for (const w of report.warnings) console.warn(`[config] ${w}`);
+  for (const e of report.errors) console.error(`[config] ${e}`);
+  if (report.errors.length && process.env.NODE_ENV === "production") {
+    throw new Error(`Refusing to start: ${report.errors.join("; ")}`);
+  }
   if (process.env.IN_PROCESS_WORKER === "false" || process.env.NODE_ENV === "test") return;
   const { runBackgroundTick } = await import("./lib/server/worker");
   const g = globalThis as unknown as { __dskWorker?: NodeJS.Timeout };

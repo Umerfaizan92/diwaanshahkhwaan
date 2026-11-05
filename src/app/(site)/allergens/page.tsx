@@ -43,7 +43,7 @@ export default async function AllergensPage() {
           </p>
         </Prose>
 
-        <div className="overflow-x-auto rounded-2xl border border-line" tabIndex={0} role="region" aria-label="Allergens by dish table">
+        <div className="relative overflow-x-auto rounded-2xl border border-line" tabIndex={0} role="region" aria-label="Allergens by dish table">
           <table className="w-full min-w-[36rem] text-left text-[0.95rem]">
             <caption className="sr-only">Allergens by dish</caption>
             <thead className="bg-raised">

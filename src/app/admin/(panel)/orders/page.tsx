@@ -50,9 +50,9 @@ export default async function OrdersBoard({ searchParams }: PageProps<"/admin/or
           {tab("upcoming", "Upcoming")}
           {tab("past", "Past 30 days")}
         </nav>
-        <form className="flex gap-2" action="/admin/orders">
+        <form className="flex w-full flex-wrap gap-2 sm:w-auto" action="/admin/orders">
           <input type="date" name="date" defaultValue={day ?? ""} aria-label="Pickup date" className="h-9 rounded-lg border border-line bg-sunken px-2 text-sm" />
-          <input name="q" defaultValue={q} placeholder="Search name, phone, DSK-…" aria-label="Search orders" className="h-9 w-56 rounded-lg border border-line bg-sunken px-3 text-sm" />
+          <input name="q" defaultValue={q} placeholder="Search name, phone, DSK-…" aria-label="Search orders" className="h-9 min-w-0 flex-1 rounded-lg sm:w-56 sm:flex-none border border-line bg-sunken px-3 text-sm" />
           <button className={buttonClass("ghost", "sm")}>Filter</button>
         </form>
       </div>

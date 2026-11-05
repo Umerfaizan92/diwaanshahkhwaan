@@ -4,6 +4,7 @@ import { getDb, schema, type DB, type DbOrTx } from "@/lib/db";
 import { ACTIVE_STATUSES } from "@/lib/domain/order-status";
 import { renderTemplate, type TemplateName } from "./email-templates";
 import { getEmailSender, getSmsSender } from "./messaging";
+import { appUrl } from "@/lib/config/app-url";
 
 export type OrderNotice = "order_confirmed" | "order_accepted" | "order_ready" | "order_cancelled" | "order_refunded" | "order_partially_refunded" | "pickup_reminder";
 
@@ -11,7 +12,6 @@ const SMS_KINDS: OrderNotice[] = ["order_ready", "order_cancelled", "pickup_remi
 /** Retry backoff after attempt n (minutes) */
 const BACKOFF_MIN = [1, 5, 15, 60, 180];
 
-const appUrl = () => (process.env.APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
 
 type JobInsert = typeof schema.notificationJobs.$inferInsert;
 
