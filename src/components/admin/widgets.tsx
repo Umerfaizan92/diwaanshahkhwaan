@@ -13,6 +13,10 @@ import {
   transitionAction,
   updateStaffAction,
   uploadMediaAction,
+  retryJobAction,
+  cancelJobAction,
+  resendNotificationAction,
+  sendTestEmailAction,
 } from "@/app/admin/(panel)/actions";
 import type { OrderStatus } from "@/lib/db/schema";
 import { STATUS_LABEL } from "@/lib/domain/order-status";
@@ -334,5 +338,56 @@ export function Collapsible({ title, children }: { title: string; children: Reac
       <summary className="cursor-pointer px-4 py-3 font-semibold">{title}</summary>
       <div className="border-t border-line p-4">{children}</div>
     </details>
+  );
+}
+
+export function JobButtons({ id, status }: { id: string; status: string }) {
+  const { pending, msg, run } = useAction();
+  return (
+    <div className="flex items-center gap-2">
+      {status === "FAILED" || status === "CANCELLED" ? (
+        <button type="button" disabled={pending} onClick={() => run(() => retryJobAction(id))} className="text-xs font-semibold text-gold underline">
+          Retry
+        </button>
+      ) : null}
+      {status === "PENDING" ? (
+        <button type="button" disabled={pending} onClick={() => run(() => cancelJobAction(id))} className="text-xs text-muted underline hover:text-danger">
+          Cancel
+        </button>
+      ) : null}
+      {msg ? <span className={`text-xs ${msg.tone === "error" ? "text-danger" : "text-success"}`}>{msg.text}</span> : null}
+    </div>
+  );
+}
+
+export function ResendButtons({ orderId, options }: { orderId: string; options: { template: "order_confirmed" | "order_accepted" | "order_ready" | "order_cancelled" | "order_refunded"; label: string }[] }) {
+  const { pending, msg, run } = useAction();
+  return (
+    <div className="space-y-2">
+      <Msg msg={msg} />
+      <div className="flex flex-wrap gap-2">
+        {options.map((o) => (
+          <Button key={o.template} size="sm" variant="ghost" disabled={pending} onClick={() => run(() => resendNotificationAction(orderId, o.template))}>
+            Resend: {o.label}
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function TestEmailForm({ defaultTo }: { defaultTo: string }) {
+  const { pending, msg, run } = useAction();
+  const [to, setTo] = useState(defaultTo);
+  return (
+    <div className="space-y-2">
+      <Msg msg={msg} />
+      <div className="flex flex-wrap gap-2">
+        <input aria-label="Send a test email to" type="email" value={to} onChange={(e) => setTo(e.target.value)} className="h-10 w-72 rounded-lg border border-line bg-sunken px-3" placeholder="you@example.com" />
+        <Button variant="outline" disabled={pending || !to} onClick={() => run(() => sendTestEmailAction(to))}>
+          Send test email
+        </Button>
+      </div>
+    </div>
   );
 }

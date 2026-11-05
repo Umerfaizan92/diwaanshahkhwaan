@@ -1,4 +1,5 @@
 import { ingestWebhook } from "@/lib/server/payments";
+import { kickNotifications } from "@/lib/server/worker";
 
 export const dynamic = "force-dynamic";
 
@@ -9,5 +10,6 @@ export async function POST(req: Request, ctx: RouteContext<"/api/payments/webhoo
   const raw = await req.text();
   if (raw.length > 1_000_000) return new Response("too large", { status: 413 });
   const r = await ingestWebhook(provider, raw, req.headers);
+  if (r.status === 200) kickNotifications();
   return new Response(r.body, { status: r.status });
 }

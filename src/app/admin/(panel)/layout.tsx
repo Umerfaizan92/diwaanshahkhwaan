@@ -22,6 +22,7 @@ const NAV: (NavItem & { perm: Permission })[] = [
   { href: "/admin/customers", label: "Customers", perm: "customers:view" },
   { href: "/admin/reports", label: "Sales reports", perm: "reports:view" },
   { href: "/admin/messages", label: "Messages", perm: "messages:view" },
+  { href: "/admin/notifications", label: "Notifications", perm: "notifications:manage" },
   { href: "/admin/settings", label: "Settings", perm: "settings:edit" },
   { href: "/admin/staff", label: "Staff", perm: "staff:manage" },
   { href: "/admin/audit", label: "Audit log", perm: "audit:view" },
@@ -35,9 +36,10 @@ export default async function AdminPanelLayout({ children }: { children: React.R
       newOrders: sql<number>`(select count(*)::int from orders where status = 'NEW')`,
       attention: sql<number>`(select count(*)::int from orders where attention_reason is not null)`,
       messages: sql<number>`(select count(*)::int from contact_messages where handled = false)`,
+      failedJobs: sql<number>`(select count(*)::int from notification_jobs where status = 'FAILED')`,
     })
     .from(sql`(select 1) x`);
-  const badges: Record<string, number> = { "/admin/orders": counts.newOrders + counts.attention, "/admin/messages": counts.messages };
+  const badges: Record<string, number> = { "/admin/orders": counts.newOrders + counts.attention, "/admin/messages": counts.messages, "/admin/notifications": counts.failedJobs };
   const items = NAV.filter((n) => can(user.role, n.perm)).map(({ href, label }) => ({ href, label, badge: badges[href] || undefined }));
   return (
     <div className="lg:flex">

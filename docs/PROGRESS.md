@@ -10,7 +10,7 @@ Status key: ✅ done and verified · 🟡 in progress · ⬜ not started
 | 3 | Scheduling engine | ✅ | 15 boundary unit tests (notice, cut-off, DST, capacity, limits); concurrency integration tests (12 racing checkouts for 4 places → exactly 4; dish daily cap never oversold); owner schedule UI tested in a browser |
 | 4 | Checkout and payments (test mode) | ✅ | 15 payment integration tests (success, duplicates, late webhook, reconcile, failure plus retry, cancel, expiry, late payment, amount mismatch, refunds incl. concurrency and provider failure, Stripe and demo signature checks, live-key guard); browser run: decline → retry → paid → receipt, cancel at payment page, account sign-up |
 | 5 | Owner dashboard and RBAC | ✅ | 9 admin integration tests (RBAC matrix, workflow rules, last-owner and self guards, session revocation, ABN checksum, reports, CSV injection guard, image re-encoding); browser: all 16 admin pages load with no console errors; kitchen role denied 6 restricted pages and the CSV export (403) |
-| 6 | Notifications | ⬜ | |
+| 6 | Notifications | ✅ | 14 notification tests (queueing, dedupe on duplicate payments, scheduled reminders, SMS opt-in, reminder cancellation, per-refund emails, backoff retry, max attempts plus staff retry, permanent errors, crash lease recovery, 5 concurrent workers send each message once, owner switches, HTML escaping, all templates); browser: paid order → confirmation, owner alert and reminder logged; a real retry recovered a failed test email |
 | 7 | SEO, accessibility, legal, compliance | ⬜ | |
 | 8 | Audit and readiness report | ⬜ | |
 
@@ -71,6 +71,16 @@ Status key: ✅ done and verified · 🟡 in progress · ⬜ not started
   business settings (contacts, private pickup address, ABN with checksum, GST switch, announcement); staff and roles;
   read-only audit log; a food photo library (uploads decoded and re-encoded to WebP with sharp, stored in Postgres).
   Every page and action re-checks permissions on the server.
+
+- Phase 6: branded, table-based HTML and plain-text emails for confirmation, kitchen acceptance, ready for pickup,
+  pickup reminder, cancellation, full and partial refunds, an owner new-order alert and a test message. Optional SMS
+  (Twilio) for opted-in customers. A durable Postgres job queue: jobs are created in the same transaction as the
+  order change; a unique dedupe key per logical message; `FOR UPDATE SKIP LOCKED` claiming with a 2-minute lease;
+  exponential backoff (1/5/15/60/180 min) up to 6 attempts; permanent-error detection; provider idempotency keys.
+  Processed by the in-process worker, the cron endpoint, and immediately after payments and staff actions. Owner
+  controls: channel switches, owner alert address, reminder timing, test email, a delivery log with retry and
+  cancel, and per-order message history with resend. Fixed: the test-email template crashed without an order;
+  default pickup instructions contradicted the confirmation.
 
 ## Unresolved issues / next steps
 

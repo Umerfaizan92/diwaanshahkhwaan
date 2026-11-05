@@ -11,7 +11,9 @@ import { formatDateLong } from "@/lib/domain/time";
 import { formatTime12 } from "@/lib/domain/hours";
 import { toTelHref } from "@/lib/config/business";
 import { AdminHeader, Badge, Panel } from "@/components/admin/ui";
-import { OrderControls, RefundForm } from "@/components/admin/widgets";
+import { OrderControls, RefundForm, ResendButtons } from "@/components/admin/widgets";
+import { getDb, schema } from "@/lib/db";
+import { desc, eq } from "drizzle-orm";
 
 export const metadata: Metadata = { title: "Order" };
 
@@ -20,6 +22,7 @@ export default async function OrderDetailPage({ params }: PageProps<"/admin/orde
   const { id } = await params;
   const [o, s] = await Promise.all([orderDetail(id), getSettings()]);
   if (!o) notFound();
+  const jobs = await getDb().select().from(schema.notificationJobs).where(eq(schema.notificationJobs.orderId, o.id)).orderBy(desc(schema.notificationJobs.createdAt));
   const dt = (d: Date) => new Intl.DateTimeFormat("en-AU", { dateStyle: "medium", timeStyle: "short", timeZone: s.timezone }).format(d);
   const succeeded = o.payments.filter((p) => p.status === "SUCCEEDED" || p.status === "PARTIALLY_REFUNDED" || p.status === "REFUNDED");
   const paidCents = succeeded.reduce((n, p) => n + p.amountCents, 0);
@@ -135,6 +138,34 @@ export default async function OrderDetailPage({ params }: PageProps<"/admin/orde
                   </ul>
                 </>
               ) : null}
+            </Panel>
+          ) : null}
+          {can(user.role, "notifications:manage") && o.paidAt ? (
+            <Panel title="Messages to the customer">
+              {jobs.length ? (
+                <ul className="mb-4 space-y-1 text-sm">
+                  {jobs.map((j) => (
+                    <li key={j.id} className="flex flex-wrap justify-between gap-2">
+                      <span>
+                        {j.template.replace(/_/g, " ")} ({j.channel.toLowerCase()})
+                      </span>
+                      <span className={j.status === "FAILED" ? "text-danger" : j.status === "SENT" ? "text-success" : "text-muted"}>
+                        {j.status.toLowerCase()} {j.status === "SENT" && j.sentAt ? dt(j.sentAt) : j.status === "PENDING" ? dt(j.runAt) : ""}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mb-4 text-sm text-muted">No messages yet.</p>
+              )}
+              <ResendButtons
+                orderId={o.id}
+                options={[
+                  { template: "order_confirmed", label: "confirmation" },
+                  ...(o.status === "READY" ? [{ template: "order_ready" as const, label: "ready for pickup" }] : []),
+                  ...(o.status === "CANCELLED" ? [{ template: "order_cancelled" as const, label: "cancellation" }] : []),
+                ]}
+              />
             </Panel>
           ) : null}
           {can(user.role, "orders:refund") && paidCents > 0 ? (

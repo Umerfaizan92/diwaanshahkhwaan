@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db";
 import { DemoProvider } from "@/lib/server/payment-providers";
 import { ingestWebhook, orderUrl } from "@/lib/server/payments";
+import { kickNotifications } from "@/lib/server/worker";
 
 /**
  * Simulates what a hosted payment page + provider webhook do. The app learns the outcome ONLY
@@ -36,5 +37,6 @@ export async function demoOutcome(sessionId: string, outcome: "pay" | "decline" 
   await db.update(schema.demoPaymentSessions).set({ status: "paid", paymentId }).where(eq(schema.demoPaymentSessions.id, sessionId));
   const { body, headers } = provider.signedEvent({ id: "evt_demo_" + randomBytes(8).toString("hex"), type: "payment.succeeded", sessionId, paymentId, amountCents: s.amountCents, currency: s.currency });
   await ingestWebhook("demo", body, headers);
+  kickNotifications();
   redirect(orderUrl(order, "&from=payment"));
 }

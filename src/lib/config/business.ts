@@ -10,7 +10,7 @@ export const BUSINESS_DEFAULTS = {
   strapline: "Royal flavours served with love",
   pickupArea: "Langford WA 6147",
   pickupInstructions:
-    "Pickup only, from our home kitchen in the Langford area. The exact pickup address is sent with your paid order confirmation.",
+    "Please arrive within your pickup time, and call us if you are running late.",
   timezone: "Australia/Perth",
   currency: "AUD",
   contacts: [
