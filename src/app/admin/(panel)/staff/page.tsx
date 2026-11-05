@@ -3,11 +3,10 @@ import { asc } from "drizzle-orm";
 import { requireStaffPage } from "@/lib/server/auth";
 import { getDb, schema } from "@/lib/db";
 import { getSettings } from "@/lib/server/settings";
-import { ROLE_LABEL, ROLES } from "@/lib/domain/permissions";
 import { AdminHeader, Panel } from "@/components/admin/ui";
 import { StaffCreate, StaffRow } from "@/components/admin/widgets";
 
-export const metadata: Metadata = { title: "Staff" };
+export const metadata: Metadata = { title: "Owner login" };
 
 export default async function StaffPage() {
   const me = await requireStaffPage("staff:manage");
@@ -16,9 +15,9 @@ export default async function StaffPage() {
   const fmt = (d: Date | null) => (d ? new Intl.DateTimeFormat("en-AU", { dateStyle: "medium", timeStyle: "short", timeZone: s.timezone }).format(d) : null);
   return (
     <>
-      <AdminHeader title="Staff & permissions" intro="Who can sign in to the dashboard and what they can do. Changes take effect immediately." />
+      <AdminHeader title="Owner login" intro="Only the business owner can sign in to this dashboard. Change your password here, or add a second owner login (for example a partner). Nobody else has access." />
       <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
-        <Panel title="Team">
+        <Panel title="Owner logins">
           <ul className="divide-y divide-line/70">
             {staff.map((u) => (
               <StaffRow key={u.id} isMe={u.id === me.id} u={{ id: u.id, name: u.name, email: u.email, role: u.role, active: u.active, lastLoginAt: fmt(u.lastLoginAt) }} />
@@ -26,15 +25,8 @@ export default async function StaffPage() {
           </ul>
         </Panel>
         <div className="space-y-6">
-          <Panel title="Add a staff member">
+          <Panel title="Add another owner login">
             <StaffCreate />
-          </Panel>
-          <Panel title="Roles">
-            <ul className="space-y-2 text-sm">
-              {ROLES.map((r) => (
-                <li key={r}>{ROLE_LABEL[r]}</li>
-              ))}
-            </ul>
           </Panel>
         </div>
       </div>

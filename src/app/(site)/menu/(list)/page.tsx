@@ -45,18 +45,6 @@ export default async function MenuPage() {
           </ul>
         </Container>
       </nav>
-      {/* On phones, also show every category up front as a tidy grid */}
-      <Container className="pt-6 md:hidden">
-        <ul className="grid grid-cols-2 gap-2">
-          {menu.map((c) => (
-            <li key={c.slug}>
-              <a href={`#${c.slug}`} className="flex min-h-11 items-center justify-center rounded-xl border border-line bg-raised px-2 py-2 text-center text-[0.88rem] leading-tight text-text/90 hover:border-gold hover:text-gold">
-                {c.name}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </Container>
       <Container className="pt-10">
         {menu.length === 0 ? (
           <p className="py-20 text-center text-muted">The menu is being updated. Please check back soon or call us to order.</p>

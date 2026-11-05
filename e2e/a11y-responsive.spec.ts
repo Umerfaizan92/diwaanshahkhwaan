@@ -56,15 +56,15 @@ test("reduced motion: hero content is visible without animation", async ({ page 
   expect(opacity).toBe("1");
 });
 
-test("keyboard: skip link and menu tabs", async ({ page }) => {
+test("keyboard: skip link and menu categories", async ({ page }) => {
   await page.goto("/");
   await page.keyboard.press("Tab");
   await expect(page.getByRole("link", { name: "Skip to content" })).toBeFocused();
-  const tab = page.getByRole("tab").first();
-  await tab.focus();
-  await page.keyboard.press("ArrowRight");
-  await expect(page.getByRole("tab").nth(1)).toBeFocused();
-  await expect(page.getByRole("tab").nth(1)).toHaveAttribute("aria-selected", "true");
+  const tile = page.locator("#menu-preview").locator("xpath=ancestor::section").getByRole("link", { name: /View dishes/ }).first();
+  await tile.focus();
+  await expect(tile).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/\/menu#/);
 });
 
 test("admin pages fit a phone screen", async ({ page }) => {

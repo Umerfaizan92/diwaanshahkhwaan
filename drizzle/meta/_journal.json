@@ -57,6 +57,13 @@
       "when": 1793909518605,
       "tag": "0007_stock_photos_remaining",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793911391767,
+      "tag": "0008_seekh_kebab_photo",
+      "breakpoints": true
     }
   ]
 }

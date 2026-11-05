@@ -24,7 +24,7 @@ const NAV: (NavItem & { perm: Permission })[] = [
   { href: "/admin/messages", label: "Messages", perm: "messages:view" },
   { href: "/admin/notifications", label: "Notifications", perm: "notifications:manage" },
   { href: "/admin/settings", label: "Settings", perm: "settings:edit" },
-  { href: "/admin/staff", label: "Staff", perm: "staff:manage" },
+  { href: "/admin/staff", label: "Owner login", perm: "staff:manage" },
   { href: "/admin/audit", label: "Audit log", perm: "audit:view" },
 ];
 

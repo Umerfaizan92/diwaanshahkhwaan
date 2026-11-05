@@ -5,7 +5,7 @@ import type { BusinessSettings, OpeningHours } from "@/lib/db/schema";
 import { formatHoursSummary } from "@/lib/domain/hours";
 
 const LEGAL = [
-  { href: "/account", label: "My orders" },
+  { href: "/admin/login", label: "Owner login" },
   { href: "/faq", label: "FAQs" },
   { href: "/allergens", label: "Allergen information" },
   { href: "/refunds", label: "Refunds & cancellations" },

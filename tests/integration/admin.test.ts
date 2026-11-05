@@ -87,9 +87,11 @@ describe("kitchen production plan", () => {
 
 describe("staff management guards", () => {
   it("creates staff, prevents removing the last owner or yourself, and revokes sessions on change", async () => {
-    expect((await createStaff(owner, { name: "Cook One", email: "cook@example.com", role: "KITCHEN", password: "short" }, db)).ok).toBe(false);
-    expect((await createStaff(owner, { name: "Cook One", email: "cook@example.com", role: "KITCHEN", password: "a-long-password!" }, db)).ok).toBe(true);
-    expect((await createStaff(owner, { name: "Cook Two", email: "cook@example.com", role: "KITCHEN", password: "a-long-password!" }, db)).ok).toBe(false);
+    // Owner-only dashboard: other roles can't be created
+    expect((await createStaff(owner, { name: "Cook One", email: "cook@example.com", role: "KITCHEN", password: "a-long-password!" }, db)).ok).toBe(false);
+    expect((await createStaff(owner, { name: "Cook One", email: "cook@example.com", role: "OWNER", password: "short" }, db)).ok).toBe(false);
+    expect((await createStaff(owner, { name: "Cook One", email: "cook@example.com", role: "OWNER", password: "a-long-password!" }, db)).ok).toBe(true);
+    expect((await createStaff(owner, { name: "Cook Two", email: "cook@example.com", role: "OWNER", password: "a-long-password!" }, db)).ok).toBe(false);
     await createStaff(owner, { name: "Only Owner", email: "boss@example.com", role: "OWNER", password: "a-long-password!" }, db);
     const [boss] = await db.select().from(schema.staffUsers).where(eq(schema.staffUsers.email, "boss@example.com"));
     expect((await updateStaff(owner, boss.id, { role: "KITCHEN" }, db)).ok).toBe(false);

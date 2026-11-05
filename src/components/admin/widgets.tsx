@@ -21,7 +21,7 @@ import {
 } from "@/app/admin/(panel)/actions";
 import type { OrderStatus } from "@/lib/db/schema";
 import { STATUS_LABEL } from "@/lib/domain/order-status";
-import { ROLE_LABEL, ROLES } from "@/lib/domain/permissions";
+import { ROLE_LABEL } from "@/lib/domain/permissions";
 import { formatCents } from "@/lib/domain/money";
 import { Alert, Field, Input, Select, Textarea } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
@@ -223,12 +223,8 @@ export function StaffCreate() {
           <Input id="s-email" name="email" type="email" error={errors.email} />
         </Field>
         <Field id="s-role" label="Role" required>
-          <Select id="s-role" name="role" defaultValue="KITCHEN">
-            {ROLES.map((r) => (
-              <option key={r} value={r}>
-                {ROLE_LABEL[r]}
-              </option>
-            ))}
+          <Select id="s-role" name="role" defaultValue="OWNER">
+            <option value="OWNER">{ROLE_LABEL.OWNER}</option>
           </Select>
         </Field>
         <Field id="s-pw" label="Temporary password" error={errors.password} hint="12+ characters. Share it privately." required>
@@ -236,7 +232,7 @@ export function StaffCreate() {
         </Field>
       </div>
       <Button type="submit" disabled={pending}>
-        Add staff member
+        Add owner login
       </Button>
     </form>
   );
@@ -257,13 +253,7 @@ export function StaffRow({ u, isMe }: { u: { id: string; name: string; email: st
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <select aria-label={`Role for ${u.name}`} value={u.role} disabled={pending} onChange={(e) => run(() => updateStaffAction(u.id, { role: e.target.value }))} className="h-9 rounded-lg border border-line bg-sunken px-2 text-sm">
-            {ROLES.map((r) => (
-              <option key={r} value={r}>
-                {r.charAt(0) + r.slice(1).toLowerCase()}
-              </option>
-            ))}
-          </select>
+          <span className="rounded-full border border-gold/40 px-2.5 py-1 text-xs font-semibold text-gold">{u.role === "OWNER" ? "Owner" : "No access"}</span>
           {!isMe ? (
             <Button size="sm" variant={u.active ? "danger" : "outline"} disabled={pending} onClick={() => run(() => updateStaffAction(u.id, { active: !u.active }))}>
               {u.active ? "Deactivate" : "Reactivate"}

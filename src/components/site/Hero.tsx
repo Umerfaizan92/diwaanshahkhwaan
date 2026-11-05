@@ -46,12 +46,14 @@ export function Hero({ pickupArea, acceptingOrders }: { pickupArea: string; acce
       <div className="mx-auto w-full max-w-7xl px-4 pb-10 pt-24 sm:px-6 lg:px-8 lg:pb-0 lg:pt-28">
         {/* Gold Mughal arch framing the wordmark: drawn inside the content box so nothing spills off-screen */}
         <div className="relative w-full max-w-xl">
-          <svg viewBox="0 0 400 520" className="pointer-events-none absolute inset-0 h-full w-full text-[#d9b45a]" fill="none" aria-hidden preserveAspectRatio="none">
-            <path className="arch-draw" pathLength={1} d="M2 518V196C2 122 72 84 122 63c32-13 54-25 78-55 24 30 46 42 78 55 50 21 120 59 120 133v322" stroke="currentColor" strokeWidth="1.25" vectorEffect="non-scaling-stroke" />
+          {/* Crown of the arch has a fixed height, so the wording always sits below its curve on every screen */}
+          <svg viewBox="0 0 400 144" className="pointer-events-none absolute inset-x-0 top-0 h-32 w-full text-[#d9b45a] sm:h-36" fill="none" aria-hidden preserveAspectRatio="none">
+            <path className="arch-draw" pathLength={1} d="M1 144C1 92 64 68 120 52 160 40 184 28 200 3c16 25 40 37 80 49 56 16 119 40 119 92" stroke="currentColor" strokeWidth="1.25" vectorEffect="non-scaling-stroke" />
           </svg>
+          <div aria-hidden className="fade-in pointer-events-none absolute inset-x-0 bottom-0 top-32 border-x border-[#d9b45a]/90 [animation-delay:0.8s] sm:top-36" />
 
           {/* Logo at the crown of the arch, with steam rising from the handi */}
-          <div className="fade-in absolute left-1/2 top-[3.2rem] -translate-x-1/2 [animation-delay:0.6s] sm:top-[3.6rem]">
+          <div className="fade-in absolute left-1/2 top-[2.6rem] -translate-x-1/2 [animation-delay:0.6s] sm:top-[2.9rem]">
             <div className="smoke" aria-hidden>
               <span />
               <span />
@@ -61,7 +63,7 @@ export function Hero({ pickupArea, acceptingOrders }: { pickupArea: string; acce
             <Image src="/images/brand/emblem.png" alt="" width={84} height={84} priority className="relative size-16 rounded-full shadow-[0_0_28px_-4px_rgb(226_189_94/0.55)] ring-1 ring-[#d9b45a]/70 sm:size-20" />
           </div>
 
-          <div className="relative px-5 pb-8 pt-[8.5rem] sm:px-9 sm:pb-12 sm:pt-[10rem]">
+          <div className="relative px-5 pb-8 pt-[9.25rem] sm:px-9 sm:pb-12 sm:pt-[10.5rem]">
             <p className="hero-shadow fade-in font-display text-[clamp(0.8rem,3.4vw,1rem)] font-semibold tracking-wide text-[#f3d68a] [animation-delay:0.5s]">
               Home-cooked in {pickupArea.replace(/\s*WA.*$/, "")}, Perth
             </p>

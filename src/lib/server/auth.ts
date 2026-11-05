@@ -82,7 +82,8 @@ export const getStaff = cache(async (): Promise<StaffUser | null> => {
   const s = await readSession("STAFF");
   if (!s) return null;
   const [u] = await getDb().select().from(schema.staffUsers).where(eq(schema.staffUsers.id, s.subjectId)).limit(1);
-  if (!u || !u.active) return null;
+  // The dashboard is for the business owner only: any other role is treated as signed out
+  if (!u || !u.active || u.role !== "OWNER") return null;
   return { id: u.id, email: u.email, name: u.name, role: u.role };
 });
 

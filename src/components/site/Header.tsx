@@ -140,8 +140,8 @@ export function Header() {
                 </li>
               ))}
               <li>
-                <Link href="/account" className="flex items-center justify-between border-b border-line/60 py-4 font-display text-xl">
-                  My orders
+                <Link href="/admin/login" className="flex items-center justify-between border-b border-line/60 py-4 font-display text-xl">
+                  Owner login
                   <span aria-hidden className="text-gold">›</span>
                 </Link>
               </li>

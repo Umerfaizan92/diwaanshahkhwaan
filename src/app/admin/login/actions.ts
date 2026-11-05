@@ -21,9 +21,9 @@ export async function staffLogin(_prev: { error?: string; email?: string }, form
 
   const [u] = await getDb().select().from(schema.staffUsers).where(eq(schema.staffUsers.email, email)).limit(1);
   const valid = await verifyPassword(password, u?.passwordHash);
-  if (!u || !valid || !u.active) {
+  if (!u || !valid || !u.active || u.role !== "OWNER") {
     await audit(null, "staff.login_failed", "staff_user", u?.id ?? null, { email, ip });
-    return { error: "That email and password don't match an active account.", email };
+    return { error: "That email and password don't match the owner account.", email };
   }
   await startStaffSession(u.id);
   await audit({ id: u.id, email: u.email }, "staff.login", "staff_user", u.id, { ip });

@@ -4,7 +4,6 @@ import { z } from "zod";
 import sharp from "sharp";
 import { getDb, schema, type DB } from "@/lib/db";
 import { auPhone, email, personName } from "@/lib/domain/validation";
-import { ROLES } from "@/lib/domain/permissions";
 import { hashPassword, revokeSessions, type StaffUser } from "./auth";
 import { audit } from "./audit";
 import type { ActionResult } from "./action";
@@ -83,7 +82,8 @@ export async function saveNotificationSettings(actor: StaffUser, raw: unknown, d
 /* ---------------- Staff ---------------- */
 
 const password = z.string().min(12, "Use at least 12 characters").max(200);
-export const newStaffSchema = z.object({ name: personName, email, role: z.enum(ROLES), password });
+// Only owner logins can be created: the dashboard is for the business owner only
+export const newStaffSchema = z.object({ name: personName, email, role: z.literal("OWNER"), password });
 
 async function ownerCount(db: DB, exceptId?: string) {
   const [r] = await db
@@ -108,7 +108,7 @@ export async function updateStaff(actor: StaffUser, id: string, patch: { role?: 
   if (!u) return { ok: false, error: "Staff member not found" };
   const set: Partial<typeof schema.staffUsers.$inferInsert> = {};
   if (patch.role !== undefined) {
-    const r = z.enum(ROLES).safeParse(patch.role);
+    const r = z.literal("OWNER").safeParse(patch.role);
     if (!r.success) return { ok: false, error: "Unknown role" };
     if (u.role === "OWNER" && r.data !== "OWNER" && (await ownerCount(db, u.id)) === 0) return { ok: false, error: "There must always be at least one active owner." };
     set.role = r.data;

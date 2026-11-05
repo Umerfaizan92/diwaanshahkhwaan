@@ -26,13 +26,12 @@ function newKey() {
 
 export function CheckoutForm({
   prefill,
-  signedIn,
   smsAvailable,
   acceptCash = true,
   acceptCard = true,
 }: {
   prefill: Prefill;
-  signedIn: boolean;
+  signedIn?: boolean;
   smsAvailable: boolean;
   acceptCash?: boolean;
   acceptCard?: boolean;
@@ -123,15 +122,7 @@ export function CheckoutForm({
           <h2 id="details-h" className="font-display text-2xl">
             2. Your details
           </h2>
-          {!signedIn ? (
-            <p className="text-sm text-muted">
-              Checking out as a guest.{" "}
-              <Link href="/account?next=/checkout" className="text-gold underline">
-                Sign in
-              </Link>{" "}
-              to keep your order history.
-            </p>
-          ) : null}
+          <p className="text-sm text-muted">No account needed. Your confirmation email has a private link to track your order.</p>
           <div className="grid gap-5 sm:grid-cols-2">
             <Field id="name" label="Name" error={errors.name} required>
               <Input id="name" name="name" autoComplete="name" defaultValue={prefill?.name} error={errors.name} required />

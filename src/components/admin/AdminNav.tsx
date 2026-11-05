@@ -33,7 +33,7 @@ export function AdminNav({ items, user, logout }: { items: NavItem[]; user: { na
     <>
       <div className="no-print sticky top-0 z-30 flex h-14 items-center justify-between border-b border-line bg-bg/95 px-4 backdrop-blur lg:hidden">
         <Link href="/admin" className="font-display text-lg">
-          <span className="gold-leaf font-bold">DSK</span> Kitchen
+          <span className="gold-leaf font-bold">DSK</span> Owner
         </Link>
         <button type="button" aria-expanded={open} aria-controls="admin-nav-mobile" onClick={() => setOpenOn(open ? null : pathname)} className="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-text/5">
           {open ? "Close" : "Menu"}
@@ -49,7 +49,7 @@ export function AdminNav({ items, user, logout }: { items: NavItem[]; user: { na
       ) : null}
       <aside className="no-print sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-line bg-sunken px-3 py-5 lg:flex">
         <Link href="/admin" className="mb-6 px-3 font-display text-xl">
-          <span className="gold-leaf font-bold">DSK</span> Kitchen
+          <span className="gold-leaf font-bold">DSK</span> Owner
         </Link>
         <nav aria-label="Dashboard" className="flex-1 overflow-y-auto">
           {list}

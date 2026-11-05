@@ -1,6 +1,6 @@
 import { expect, type Page } from "@playwright/test";
 
-export const PUBLIC_PAGES = ["/", "/menu", "/menu/shahi-chicken-biryani", "/menu/shahi-chicken-korma", "/specials", "/weekly-menu", "/order-ahead", "/about", "/contact", "/faq", "/allergens", "/refunds", "/terms", "/privacy", "/cart", "/checkout", "/account"];
+export const PUBLIC_PAGES = ["/", "/menu", "/menu/shahi-chicken-biryani", "/menu/shahi-chicken-korma", "/specials", "/weekly-menu", "/order-ahead", "/about", "/contact", "/faq", "/allergens", "/refunds", "/terms", "/privacy", "/cart", "/checkout"];
 
 export async function staffLogin(page: Page, email = process.env.SEED_OWNER_EMAIL!, password = process.env.SEED_OWNER_PASSWORD!) {
   await page.goto("/admin/login");

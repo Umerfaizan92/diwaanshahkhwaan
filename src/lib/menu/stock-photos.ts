@@ -5,7 +5,7 @@ export const STOCK_PHOTOS: Record<string, { url: string; alt: string }> = {
   "shahi-chicken-degi": { url: "https://images.pexels.com/photos/12737808/pexels-photo-12737808.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Creamy meat curry with flatbread (serving suggestion)" },
   "shahi-butter-chicken": { url: "https://images.pexels.com/photos/29685054/pexels-photo-29685054.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Butter chicken in a copper pan (serving suggestion)" },
   "shahi-lamb-karahi": { url: "https://images.pexels.com/photos/9609846/pexels-photo-9609846.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Meat curry in a bowl (serving suggestion)" },
-  "shahi-seekh-kebab-karahi": { url: "https://images.pexels.com/photos/1105325/pexels-photo-1105325.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Grilled meat on a griddle (serving suggestion)" },
+  "shahi-seekh-kebab-karahi": { url: "/images/dishes/mixed-grill.webp", alt: "Seekh kebabs and tikka from our grill" },
   "shahi-daleem": { url: "https://images.pexels.com/photos/20408435/pexels-photo-20408435.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Slow-cooked dish in a pot with spices (serving suggestion)" },
   "chicken-shawarma-with-sauce": { url: "https://images.pexels.com/photos/9980764/pexels-photo-9980764.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Chicken shawarma wrapped in paper (serving suggestion)" },
   "shahi-crispy-chicken-roll": { url: "https://images.pexels.com/photos/5779423/pexels-photo-5779423.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Chicken roll held in hand (serving suggestion)" },

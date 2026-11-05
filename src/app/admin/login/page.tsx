@@ -14,8 +14,8 @@ export default async function StaffLoginPage() {
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center text-center">
           <Image src="/images/brand/emblem.png" alt="" width={72} height={72} className="rounded-full ring-1 ring-gold/40" priority />
-          <h1 className="mt-4 font-display text-2xl">Kitchen dashboard</h1>
-          <p className="text-sm text-muted">Diwaan Shah Khwaan staff only</p>
+          <h1 className="mt-4 font-display text-2xl">Owner dashboard</h1>
+          <p className="text-sm text-muted">For the business owner only. Customers: your order link is in your confirmation email.</p>
         </div>
         <LoginForm />
       </div>

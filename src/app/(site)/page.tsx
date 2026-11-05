@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Hero } from "@/components/site/Hero";
 import { DishCard } from "@/components/site/DishCard";
-import { MenuPreview } from "@/components/site/MenuPreview";
+import { MenuCategories } from "@/components/site/MenuCategories";
 import { PickupContact } from "@/components/site/PickupContact";
 import { Container, SectionTitle } from "@/components/site/PageHeader";
 import { buttonClass } from "@/components/ui/Button";
@@ -65,27 +65,26 @@ export default async function HomePage() {
         </Container>
       </section>
 
-      {/* Kitchen story */}
-      <section aria-labelledby="kitchen" className="py-20 lg:py-28">
-        <Container className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-          <div className="relative mx-auto grid w-full max-w-lg grid-cols-5 gap-3 lg:max-w-none">
-            <div className="arch relative col-span-3 aspect-[3/4] overflow-hidden">
-              <Image src="/images/dishes/tikka-skewers.webp" alt="Chicken tikka skewers being grilled over charcoal" fill sizes="(min-width:1024px) 28vw, 55vw" className="object-cover" />
-            </div>
-            <div className="col-span-2 flex flex-col gap-3 pt-8 sm:pt-16">
-              <div className="relative aspect-square overflow-hidden rounded-2xl">
-                <Image src="/images/dishes/chicken-karahi.webp" alt="Chicken karahi with ginger and green chilli" fill sizes="(min-width:1024px) 18vw, 35vw" className="object-cover" />
-              </div>
-              <div className="relative aspect-[4/5] overflow-hidden rounded-2xl">
-                <Image src="/images/dishes/biryani-trays.webp" alt="Trays of chicken biryani" fill sizes="(min-width:1024px) 18vw, 35vw" className="object-cover" />
-              </div>
-            </div>
-          </div>
-          <div>
-            <h2 id="kitchen" className="font-display text-3xl font-semibold sm:text-4xl">
+      {/* Kitchen story: one cinematic "royal table" image of our dishes covering the whole section */}
+      <section aria-labelledby="kitchen" className="on-dark relative isolate overflow-hidden bg-[#0d0907] text-[#f7efe0]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/dishes/royal-table.webp"
+          srcSet="/images/dishes/sm/royal-table.webp 900w, /images/dishes/royal-table.webp 1920w"
+          sizes="100vw"
+          alt="A royal table of our dishes: chicken biryani, karahi, tikka skewers and Shahi BBQ platters"
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 -z-10 h-full w-full object-cover object-[40%_65%] lg:object-center"
+        />
+        <div aria-hidden className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(10_7_5/0.1)_0%,rgb(10_7_5/0.2)_30%,rgb(10_7_5/0.88)_55%,rgb(10_7_5/0.97)_100%)] lg:bg-[linear-gradient(90deg,rgb(10_7_5/0.15)_0%,rgb(10_7_5/0.45)_45%,rgb(10_7_5/0.93)_70%)]" />
+        <Container className="flex min-h-[38rem] items-end pb-14 pt-[62vw] sm:pt-[40vw] lg:min-h-[44rem] lg:items-center lg:justify-end lg:py-24">
+          <div className="max-w-xl">
+            <p className="hero-shadow font-display text-sm font-semibold tracking-wide text-[#f3d68a]">Our kitchen</p>
+            <h2 id="kitchen" className="hero-shadow mt-2 font-display text-[clamp(1.9rem,6vw,2.6rem)] font-semibold leading-tight text-[#fbf4e6]">
               A family kitchen with a royal table
             </h2>
-            <div className="mt-6 max-w-prose space-y-4 text-lg text-text/85">
+            <div className="hero-shadow mt-5 space-y-4 text-[clamp(1rem,3.6vw,1.12rem)] text-[#f7efe0]">
               <p>
                 Diwaan Shah Khwaan is a home kitchen cooking Pakistani and Mughlai favourites the way they&apos;re made at
                 family celebrations. Biryani is layered by hand, karahi is finished to order, and the BBQ is grilled fresh
@@ -96,24 +95,41 @@ export default async function HomePage() {
                 ready, hot and packed, when you arrive.
               </p>
             </div>
-            <Link href="/about" className={buttonClass("outline", "md", "mt-8")}>
+            <Link
+              href="/about"
+              className="mt-8 inline-flex min-h-12 items-center justify-center rounded-full border border-[#f3d68a]/80 bg-black/40 px-6 font-semibold text-[#fbf4e6] backdrop-blur-sm transition-colors hover:bg-black/60"
+            >
               About our kitchen
             </Link>
           </div>
         </Container>
       </section>
 
-      {/* Menu preview */}
-      <section aria-labelledby="menu-preview" className="border-t border-line/60 py-20 lg:py-24">
+      {/* Menu at a glance */}
+      <section aria-labelledby="menu-preview" className="py-20 lg:py-24">
         <Container>
-          <SectionTitle id="menu-preview" title="The menu" intro="Menu prices are before GST. 10% GST is added to your order total at checkout." />
-          <MenuPreview
-            categories={menu.map((c) => ({
-              slug: c.slug,
-              name: c.name,
-              description: c.description,
-              items: c.dishes.map((d) => ({ slug: d.slug, name: d.name, shortDescription: d.shortDescription, priceCents: d.priceCents, isAvailable: d.isAvailable, portion: d.portion, image: cardImage(d.image) })),
-            }))}
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <SectionTitle
+              id="menu-preview"
+              title="Explore the menu"
+              intro={settings.gstRegistered && settings.gstMode === "ADD_ON" ? "Our royal collections, cooked fresh to order. Menu prices are before GST; 10% GST is added at checkout." : "Royal collections, cooked fresh to order."}
+            />
+            <Link href="/menu" className={buttonClass("gold", "md", "mb-8 lg:mb-10")}>
+              View full menu
+            </Link>
+          </div>
+          <MenuCategories
+            categories={menu.map((c) => {
+              const withPhoto = c.dishes.find((d) => d.image && d.image.startsWith("/")) ?? c.dishes.find((d) => d.image);
+              return {
+                slug: c.slug,
+                name: c.name,
+                description: c.description,
+                count: c.dishes.length,
+                fromCents: Math.min(...c.dishes.map((d) => d.priceCents)),
+                image: cardImage(withPhoto?.image ?? null),
+              };
+            })}
           />
         </Container>
       </section>
