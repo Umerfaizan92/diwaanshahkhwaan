@@ -69,16 +69,16 @@ export default async function HomePage() {
       <section aria-labelledby="kitchen" className="on-dark relative isolate overflow-hidden bg-[#0d0907] text-[#f7efe0]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/dishes/royal-table.webp"
-          srcSet="/images/dishes/sm/royal-table.webp 900w, /images/dishes/royal-table.webp 1920w"
+          src="/images/dishes/royal-feast.webp"
+          srcSet="/images/dishes/sm/royal-feast.webp 900w, /images/dishes/royal-feast.webp 1672w"
           sizes="100vw"
-          alt="A royal table of our dishes: chicken biryani, karahi, tikka skewers and Shahi BBQ platters"
+          alt="A royal family table set with chicken biryani, mutton curry, seekh kebabs, naan, raita and gulab jamun"
           loading="lazy"
           decoding="async"
-          className="absolute inset-0 -z-10 h-full w-full object-cover object-[40%_65%] lg:object-center"
+          className="block aspect-[16/10] w-full object-cover object-[45%_75%] sm:aspect-[16/9] lg:absolute lg:inset-0 lg:-z-10 lg:aspect-auto lg:h-full lg:object-[30%_center]"
         />
-        <div aria-hidden className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(10_7_5/0.1)_0%,rgb(10_7_5/0.2)_30%,rgb(10_7_5/0.88)_55%,rgb(10_7_5/0.97)_100%)] lg:bg-[linear-gradient(90deg,rgb(10_7_5/0.15)_0%,rgb(10_7_5/0.45)_45%,rgb(10_7_5/0.93)_70%)]" />
-        <Container className="flex min-h-[38rem] items-end pb-14 pt-[62vw] sm:pt-[40vw] lg:min-h-[44rem] lg:items-center lg:justify-end lg:py-24">
+        <div aria-hidden className="absolute inset-0 -z-10 hidden lg:block lg:bg-[linear-gradient(90deg,rgb(10_7_5/0.15)_0%,rgb(10_7_5/0.45)_45%,rgb(10_7_5/0.93)_70%)]" />
+        <Container className="flex py-12 lg:min-h-[44rem] lg:items-center lg:justify-end lg:py-24">
           <div className="max-w-xl">
             <p className="hero-shadow font-display text-sm font-semibold tracking-wide text-[#f3d68a]">Our kitchen</p>
             <h2 id="kitchen" className="hero-shadow mt-2 font-display text-[clamp(1.9rem,6vw,2.6rem)] font-semibold leading-tight text-[#fbf4e6]">
