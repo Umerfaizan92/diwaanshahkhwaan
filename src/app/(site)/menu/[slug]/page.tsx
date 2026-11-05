@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { DishImage } from "@/components/site/DishImage";
 import { DishTags, SpiceMeter } from "@/components/site/DishCard";
 import { Container } from "@/components/site/PageHeader";
+import { AddToCart } from "@/components/shop/AddToCart";
 import { formatCentsShort } from "@/lib/domain/money";
 import { DAY_NAMES } from "@/lib/domain/hours";
 import { getDishBySlug } from "@/lib/server/menu";
@@ -72,11 +73,7 @@ export default async function DishPage({ params }: PageProps<"/menu/[slug]">) {
           <p className="mt-5 max-w-prose text-lg text-text/90">{dish.description}</p>
 
           <div className="mt-8">
-            {phone ? (
-              <a href={toTelHref(phone)} className="inline-flex h-12 items-center rounded-full bg-gold px-6 font-semibold text-gold-ink hover:bg-gold-bright">
-                Call {phone} to order
-              </a>
-            ) : null}
+            <AddToCart dish={dish} acceptingOrders={settings.acceptingOrders} />
           </div>
 
           <dl className="mt-10 divide-y divide-line/70 border-y border-line/70">

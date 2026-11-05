@@ -6,7 +6,7 @@ Status key: ✅ done and verified · 🟡 in progress · ⬜ not started
 |---|---|---|---|
 | 0 | Fresh isolated repo, architecture, schema, migrations, seed | ✅ | migrate and seed ran on a clean DB |
 | 1 | Cinematic public website | ✅ | build; 14 routes return 200; no horizontal overflow at 375/768/1024/1440; axe WCAG 2.2 AA = 0 violations in both themes; mobile nav, contact form and theme toggle tested in a browser |
-| 2 | Database menu, dish pages, options, cart, server pricing | ⬜ | |
+| 2 | Database menu, dish pages, options, cart, server pricing | ✅ | 22 unit/integration tests; browser test: add to cart, tampered client price ignored, live sold-out and price edits, portion group created in admin and priced on site |
 | 3 | Scheduling engine | ⬜ | |
 | 4 | Checkout and payments (test mode) | ⬜ | |
 | 5 | Owner dashboard and RBAC | ⬜ | |
@@ -33,6 +33,15 @@ Status key: ✅ done and verified · 🟡 in progress · ⬜ not started
   home, menu, dish, specials, weekly menu, how ordering works, about, contact (working form, DB-stored, rate-limited,
   honeypot), FAQ, allergens, refunds, terms and privacy; skeletons; 404 and error pages. Dishes without photos show a
   clearly labelled "Photo coming soon" placeholder. Unit tests found and fixed a price formatting bug ($12.5 → $12.50).
+
+- Phase 2: database-driven menu with categories, dish pages, portion groups and modifiers (required/optional, min/max,
+  price deltas, defaults, per-choice availability), allergens with an explicit "confirmed" flag, quantity steppers, a
+  persistent localStorage cart synced across tabs, and a floating cart. The server re-prices every cart from the DB
+  (`/api/cart/quote`); the browser only sends ids and quantities. Staff sign-in (bcrypt, DB-backed revocable
+  sessions, rate-limited, timing-safe) and RBAC. Owner menu admin: inline prices, sold-out switches,
+  featured/special flags, reordering, archiving, a full dish editor (options, allergens, GST treatment, limits, days,
+  photo) and a category manager. Every change is audit-logged. Fixed: login form cleared the email after a failed
+  attempt; admin rows lost their status message after refresh.
 
 ## Unresolved issues / next steps
 

@@ -3,10 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ThemeToggle } from "./ThemeToggle";
 import { buttonClass } from "@/components/ui/Button";
+import { CartButton } from "@/components/shop/CartButton";
 
 export const NAV = [
   { href: "/menu", label: "Menu" },
@@ -22,7 +23,7 @@ function subscribeScroll(cb: () => void) {
   return () => window.removeEventListener("scroll", cb);
 }
 
-export function Header({ cart }: { cart?: ReactNode }) {
+export function Header() {
   const pathname = usePathname();
   const overlay = pathname === "/";
   const scrolled = useSyncExternalStore(subscribeScroll, () => window.scrollY > 40, () => false);
@@ -98,7 +99,7 @@ export function Header({ cart }: { cart?: ReactNode }) {
 
         <div className="ml-auto flex items-center gap-1 lg:ml-2">
           <ThemeToggle className={solid ? "" : "text-[#f2e8d5]/85"} />
-          {cart}
+          <CartButton tone={solid ? "solid" : "overlay"} />
           <span className="hidden sm:block">
             <Link href="/menu" className={buttonClass("gold", "sm")}>
               Order now

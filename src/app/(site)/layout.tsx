@@ -1,5 +1,6 @@
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { FloatingCart } from "@/components/shop/CartButton";
 import { getOpeningHours, getSettings } from "@/lib/server/settings";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +19,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         {children}
       </main>
       <Footer settings={settings} hours={hours} />
+      <FloatingCart />
     </>
   );
 }
