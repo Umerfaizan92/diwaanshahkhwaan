@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { DishImage } from "./DishImage";
 import { formatCentsShort } from "@/lib/domain/money";
+import { cardImage } from "@/lib/domain/images";
 import type { PublicDish } from "@/lib/server/menu";
 
 export function SpiceMeter({ level }: { level: number }) {
@@ -18,9 +19,14 @@ export function SpiceMeter({ level }: { level: number }) {
   );
 }
 
-export function DishTags({ dish }: { dish: Pick<PublicDish, "isVegetarian" | "isDailySpecial" | "isAvailable"> }) {
+export function DishTags({ dish }: { dish: Pick<PublicDish, "isVegetarian" | "isDailySpecial" | "isAvailable"> & { isMostLoved?: boolean } }) {
   return (
     <>
+      {dish.isMostLoved && dish.isAvailable && (
+        <span className="rounded-full bg-[#e2bd5e] px-2 py-0.5 text-xs font-semibold text-[#1a1209]">
+          <span aria-hidden>♥ </span>Most loved
+        </span>
+      )}
       {!dish.isAvailable && <span className="rounded-full bg-danger/15 px-2 py-0.5 text-xs font-semibold text-danger">Sold out</span>}
       {dish.isDailySpecial && <span className="rounded-full bg-maroon px-2 py-0.5 text-xs font-semibold text-[#f6e7cf]">Special</span>}
       {dish.isVegetarian && <span className="rounded-full border border-success/50 bg-bg/90 px-2 py-0.5 text-xs font-medium text-success">Vegetarian</span>}
@@ -37,7 +43,7 @@ export function DishCard({ dish, priority = false, sizes = "(min-width:1024px) 2
     >
       <div className="relative">
         <DishImage
-          src={dish.image}
+          src={cardImage(dish.image)}
           alt={dish.imageAlt}
           name={dish.name}
           sizes={sizes}

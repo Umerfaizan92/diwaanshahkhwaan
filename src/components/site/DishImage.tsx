@@ -1,5 +1,7 @@
 import Image from "next/image";
 import { HandiIcon } from "./Emblem";
+import { isRemoteStock } from "@/lib/domain/images";
+import { RemoteDishImage } from "./RemoteDishImage";
 
 /**
  * Dish photo, or a clearly labelled placeholder when the kitchen hasn't supplied a photo yet.
@@ -25,14 +27,7 @@ export function DishImage({
   showName?: boolean;
 }) {
   const shapeClass = shape === "arch" ? "arch" : "rounded-2xl";
-  if (src) {
-    return (
-      <div className={`relative overflow-hidden bg-sunken ${shapeClass} ${className}`}>
-        <Image src={src} alt={alt} fill sizes={sizes} priority={priority} className="object-cover" />
-      </div>
-    );
-  }
-  return (
+  const placeholder = (
     <div
       className={`relative overflow-hidden ${shapeClass} ${className} flex flex-col items-center justify-center gap-2 border border-gold/25 bg-[radial-gradient(120%_90%_at_50%_20%,color-mix(in_oklab,var(--maroon)_45%,transparent),transparent_70%),var(--bg-sunken)] text-gold/80`}
       role="img"
@@ -45,4 +40,15 @@ export function DishImage({
       </span>
     </div>
   );
+  if (src && isRemoteStock(src)) {
+    return <RemoteDishImage src={src} alt={alt} priority={priority} className={`${shapeClass} ${className}`} fallback={placeholder} />;
+  }
+  if (src) {
+    return (
+      <div className={`relative overflow-hidden bg-sunken ${shapeClass} ${className}`}>
+        <Image src={src} alt={alt} fill sizes={sizes} priority={priority} className="object-cover" />
+      </div>
+    );
+  }
+  return placeholder;
 }

@@ -48,7 +48,7 @@ describe("Australian phone validation", () => {
     expect(normaliseAuPhone("+1 415 555 0100")).toBeNull();
   });
   it("builds tel: links", () => {
-    expect(toTelHref("0469 975 901")).toBe("tel:+61469975901");
+    expect(toTelHref("0452 401 786")).toBe("tel:+61452401786");
   });
   it("validates the contact form", () => {
     const ok = contactSchema.safeParse({ name: "Ali", email: "A@B.COM ", phone: "0412 345 678", topic: "bulk", message: "Hello there team" });

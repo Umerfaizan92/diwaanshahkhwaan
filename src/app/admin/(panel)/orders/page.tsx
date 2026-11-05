@@ -85,6 +85,7 @@ export default async function OrdersBoard({ searchParams }: PageProps<"/admin/or
                     </Link>
                     <div className="mt-2 flex flex-wrap gap-1">
                       {o.attentionReason ? <Badge tone="warning">Needs attention</Badge> : null}
+                      {o.paymentMethod === "CASH" ? <Badge tone={o.paidAt ? "gold" : "warning"}>{o.paidAt ? "Cash paid" : "Cash due"}</Badge> : null}
                       {o.refundedCents ? <Badge tone="danger">Refunded {formatCents(o.refundedCents)}</Badge> : null}
                     </div>
                     <div className="mt-2">

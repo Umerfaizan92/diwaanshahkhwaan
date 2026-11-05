@@ -20,7 +20,7 @@ export default async function OrderAheadPage() {
       ? { t: "Daily cut-off", d: `Orders for a given day close at ${formatTime12(s.orderCutoffTime)} the day before.` }
       : null,
     { t: "Pickup slots", d: `Pickup times are in ${s.slotMinutes}-minute slots. Each slot takes a limited number of orders so everything is fresh.` },
-    { t: "Payment", d: "You pay online when you order. Your order is confirmed once payment goes through, and we email your receipt." },
+    { t: "Payment", d: "Pay by card online, or choose cash at pickup. Either way we email your confirmation and receipt straight away." },
     { t: "Changes and cancellations", d: `Contact us at least ${s.cancelDeadlineHours} hours before pickup to change or cancel. See our refund policy for details.` },
   ].filter(Boolean) as { t: string; d: string }[];
 
@@ -32,7 +32,7 @@ export default async function OrderAheadPage() {
           {[
             ["Choose your dishes", "Add dishes to your order from the menu. Pick a spice level where it applies."],
             ["Pick a pickup date and time", "Only times we can actually cook for are shown, so if you can book it, we can make it."],
-            ["Pay securely", "Checkout is handled by our payment provider. We never see or store your card details."],
+            ["Pay your way", "Card payments go through Stripe's secure checkout, so we never see your card details. Prefer cash? Pay when you collect."],
             ["Get your confirmation", "We email your receipt and the pickup address. You can follow your order's progress online."],
             ["Collect it fresh", "We'll let you know when it's ready. Bring your order number."],
           ].map(([t, d], i) => (

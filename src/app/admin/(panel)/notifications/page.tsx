@@ -60,7 +60,7 @@ export default async function NotificationsPage({ searchParams }: PageProps<"/ad
       <div className="mb-6 grid gap-6 xl:grid-cols-2">
         <Panel title="What gets sent">
           <NotificationSettingsForm
-            initial={{ notifyEmailEnabled: s.notifyEmailEnabled, notifySmsEnabled: s.notifySmsEnabled, notifyOwnerNewOrder: s.notifyOwnerNewOrder, ownerNotifyEmail: s.ownerNotifyEmail, reminderHoursBefore: s.reminderHoursBefore }}
+            initial={{ notifyEmailEnabled: s.notifyEmailEnabled, notifySmsEnabled: s.notifySmsEnabled, notifyOwnerNewOrder: s.notifyOwnerNewOrder, ownerNotifyEmail: s.ownerNotifyEmail, ownerNotifyPhone: s.ownerNotifyPhone, notifyOwnerSms: s.notifyOwnerSms, reminderHoursBefore: s.reminderHoursBefore }}
             emailConfigured={email.configured}
             smsConfigured={sms.configured}
           />

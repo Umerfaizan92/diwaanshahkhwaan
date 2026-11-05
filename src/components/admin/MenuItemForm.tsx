@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { saveMenuItemAction } from "@/app/admin/(panel)/menu/actions";
+import { uploadMediaAction } from "@/app/admin/(panel)/actions";
 import { ALLERGEN_OPTIONS } from "@/lib/domain/allergens";
 import { DAY_SHORT } from "@/lib/domain/hours";
 import { parseDollarsToCents } from "@/lib/domain/money";
@@ -38,6 +39,28 @@ export function MenuItemForm({
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
+  const [imageList, setImageList] = useState(images);
+  const [uploading, setUploading] = useState(false);
+  const [uploadMsg, setUploadMsg] = useState<{ tone: "ok" | "err"; text: string } | null>(null);
+
+  async function uploadPhoto(file: File | undefined) {
+    if (!file) return;
+    setUploading(true);
+    setUploadMsg(null);
+    const fd = new FormData();
+    fd.set("file", file);
+    fd.set("alt", f.imageAlt || f.name || "");
+    const r = await uploadMediaAction(fd);
+    setUploading(false);
+    if (r.ok && r.data) {
+      const path = `media:${r.data.id}`;
+      setImageList((l) => [{ path, label: `Upload: ${f.imageAlt || f.name || file.name}` }, ...l]);
+      setF((p) => ({ ...p, imagePath: path }));
+      setUploadMsg({ tone: "ok", text: "Photo uploaded. Save the dish to publish it." });
+    } else {
+      setUploadMsg({ tone: "err", text: r.ok ? "Upload failed" : r.error });
+    }
+  }
   const [saved, setSaved] = useState(false);
 
   const set = <K extends keyof typeof f>(k: K, v: (typeof f)[K]) => {
@@ -162,7 +185,7 @@ export function MenuItemForm({
             </Select>
           </Field>
           <div className="grid grid-cols-2 gap-4">
-            <Field id="price" label="Price (AUD, incl. GST)" error={errors.priceCents} required>
+            <Field id="price" label="Menu price (AUD)" error={errors.priceCents} required>
               <Input id="price" inputMode="decimal" value={f.price} error={errors.priceCents} onChange={(e) => set("price", e.target.value)} />
             </Field>
             <Field id="portion" label="Portion" hint="e.g. 750ml">
@@ -376,13 +399,35 @@ export function MenuItemForm({
           <Field id="image" label="Choose photo">
             <Select id="image" value={f.imagePath ?? ""} onChange={(e) => set("imagePath", e.target.value || null)}>
               <option value="">No photo (shows “Photo coming soon”)</option>
-              {images.map((i) => (
+              {imageList.map((i) => (
                 <option key={i.path} value={i.path}>
                   {i.label}
                 </option>
               ))}
             </Select>
           </Field>
+          <div className="mt-3">
+            <label htmlFor="photo-upload" className={buttonClass("outline", "md", "w-full cursor-pointer")}>
+              {uploading ? "Uploading…" : "Upload a new photo"}
+            </label>
+            <input
+              id="photo-upload"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif"
+              className="sr-only"
+              disabled={uploading}
+              onChange={(e) => {
+                void uploadPhoto(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+            <p className="mt-1 text-xs text-muted">From your phone or computer. Resized automatically.</p>
+            {uploadMsg ? (
+              <p role="status" className={`mt-1 text-sm ${uploadMsg.tone === "ok" ? "text-success" : "text-danger"}`}>
+                {uploadMsg.text}
+              </p>
+            ) : null}
+          </div>
           <div className="mt-3">
             <Field id="alt" label="Photo description" hint="For screen readers, e.g. “Chicken biryani in a foil tray”">
               <Input id="alt" value={f.imageAlt ?? ""} onChange={(e) => set("imageAlt", e.target.value)} />

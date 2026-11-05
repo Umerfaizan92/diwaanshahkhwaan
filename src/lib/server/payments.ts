@@ -25,6 +25,7 @@ export async function startPayment(orderId: string, opts: { db?: DB; provider?: 
   const now = opts.now ?? new Date();
   const order = await db.query.orders.findFirst({ where: eq(schema.orders.id, orderId), with: { items: true, payments: true } });
   if (!order) return { ok: false, error: "Order not found" };
+  if (order.paymentMethod === "CASH") return { ok: true, url: orderUrl(order) };
   if (!["PENDING_PAYMENT", "PAYMENT_FAILED"].includes(order.status)) {
     return order.paidAt ? { ok: true, url: orderUrl(order) } : { ok: false, error: "This order can no longer be paid. Please start a new order." };
   }
@@ -48,7 +49,11 @@ export async function startPayment(orderId: string, opts: { db?: DB; provider?: 
       orderId: order.id,
       reference: order.reference,
       amountCents: order.totalCents,
-      lines: order.items.map((i) => ({ name: i.options.length ? `${i.name} (${i.options.map((o) => o.choice).join(", ")})` : i.name, unitAmountCents: i.unitPriceCents, quantity: i.quantity })),
+      lines: [
+        ...order.items.map((i) => ({ name: i.options.length ? `${i.name} (${i.options.map((o) => o.choice).join(", ")})` : i.name, unitAmountCents: i.unitPriceCents, quantity: i.quantity })),
+        // GST added on top of menu prices is charged as its own line so the total matches
+        ...(order.totalCents > order.subtotalCents ? [{ name: "GST (10%)", unitAmountCents: order.totalCents - order.subtotalCents, quantity: 1 }] : []),
+      ],
       customerEmail: order.customerEmail,
       successUrl: orderUrl(order, "&from=payment"),
       cancelUrl: `${appUrl()}/checkout/cancelled?ref=${order.reference}&t=${order.trackingToken}`,
@@ -258,7 +263,8 @@ export async function refundOrder(
 
   let result: { refundId: string; status: "SUCCEEDED" | "PENDING" | "FAILED" };
   try {
-    result = await getPaymentProvider(payment.provider).refund({ paymentId: payment.providerPaymentId!, amountCents: input.amountCents, idempotencyKey: `refund:${refund.id}`, reason: input.reason });
+    // Cash is handed back in person; there is no provider to call
+    result = payment.provider === "cash" ? { refundId: `cash-refund:${refund.id}`, status: "SUCCEEDED" } : await getPaymentProvider(payment.provider).refund({ paymentId: payment.providerPaymentId!, amountCents: input.amountCents, idempotencyKey: `refund:${refund.id}`, reason: input.reason });
   } catch (e) {
     console.error("[payments] refund failed", e);
     await db.update(schema.refunds).set({ status: "FAILED" }).where(eq(schema.refunds.id, refund.id));

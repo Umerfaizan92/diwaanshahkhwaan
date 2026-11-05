@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import * as s from "../src/lib/db/schema";
 import { CATALOG } from "../src/lib/menu/catalog";
 import { BUSINESS_DEFAULTS } from "../src/lib/config/business";
+import { STOCK_PHOTOS } from "../src/lib/menu/stock-photos";
 
 /**
  * Idempotent seed: inserts defaults only where rows don't exist yet,
@@ -25,6 +26,10 @@ export async function seed(url: string, opts: { quiet?: boolean } = {}) {
       contacts: BUSINESS_DEFAULTS.contacts,
       pickupArea: BUSINESS_DEFAULTS.pickupArea,
       pickupInstructions: BUSINESS_DEFAULTS.pickupInstructions,
+      pickupAddress: BUSINESS_DEFAULTS.pickupAddress,
+      gstMode: "ADD_ON",
+      gstRegistered: true,
+      ownerNotifyPhone: BUSINESS_DEFAULTS.contacts[0].phone,
     })
     .onConflictDoNothing();
 
@@ -51,8 +56,8 @@ export async function seed(url: string, opts: { quiet?: boolean } = {}) {
           portion: d.portion ?? null,
           priceCents: Math.round(d.price * 100),
           categoryId: c.id,
-          imagePath: d.image ?? null,
-          imageAlt: d.imageAlt ?? null,
+          imagePath: d.image ?? STOCK_PHOTOS[d.slug]?.url ?? null,
+          imageAlt: d.imageAlt ?? STOCK_PHOTOS[d.slug]?.alt ?? null,
           isFeatured: d.featured ?? false,
           isDailySpecial: d.special ?? false,
           isVegetarian: d.vegetarian ?? false,

@@ -158,6 +158,10 @@ export const businessSettings = pgTable("business_settings", {
   pickupAddress: text("pickup_address"),
   pickupInstructions: text("pickup_instructions"),
   gstRegistered: boolean("gst_registered").notNull().default(false),
+  /** INCLUSIVE: menu prices include GST. ADD_ON: 10% GST is added to the order total at checkout */
+  gstMode: text("gst_mode", { enum: ["INCLUSIVE", "ADD_ON"] }).notNull().default("INCLUSIVE"),
+  acceptCash: boolean("accept_cash").notNull().default(true),
+  acceptCard: boolean("accept_card").notNull().default(true),
   timezone: text("timezone").notNull().default("Australia/Perth"),
   minNoticeHours: integer("min_notice_hours").notNull().default(24),
   maxAdvanceDays: integer("max_advance_days").notNull().default(14),
@@ -174,6 +178,8 @@ export const businessSettings = pgTable("business_settings", {
   notifySmsEnabled: boolean("notify_sms_enabled").notNull().default(false),
   notifyOwnerNewOrder: boolean("notify_owner_new_order").notNull().default(true),
   ownerNotifyEmail: text("owner_notify_email"),
+  ownerNotifyPhone: text("owner_notify_phone"),
+  notifyOwnerSms: boolean("notify_owner_sms").notNull().default(true),
   reminderHoursBefore: integer("reminder_hours_before").notNull().default(3),
   updatedAt: updatedAt(),
 });
@@ -255,6 +261,8 @@ export const orders = pgTable(
     paidAt: timestamp("paid_at", { withTimezone: true }),
     trackingToken: text("tracking_token").notNull().unique(),
     smsOptIn: boolean("sms_opt_in").notNull().default(false),
+    paymentMethod: text("payment_method", { enum: ["CARD", "CASH"] }).notNull().default("CARD"),
+    cashCollectedAt: timestamp("cash_collected_at", { withTimezone: true }),
     /** Set when staff need to look at this order (e.g. paid after its hold expired and the slot is now over capacity) */
     attentionReason: text("attention_reason"),
     cancelReason: text("cancel_reason"),

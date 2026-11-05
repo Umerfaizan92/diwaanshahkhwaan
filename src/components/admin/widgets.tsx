@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition, type ReactNode } from "react";
 import {
   clearAttentionAction,
+  recordCashAction,
   createStaffAction,
   deleteMediaAction,
   reconcileAction,
@@ -73,6 +74,19 @@ export function NextStepButton({ orderId, status }: { orderId: string; status: O
           {msg.text}
         </p>
       ) : null}
+    </div>
+  );
+}
+
+/** Cash-at-pickup orders: record the cash once it's been handed over */
+export function CashReceivedButton({ orderId, totalLabel }: { orderId: string; totalLabel: string }) {
+  const { pending, msg, run } = useAction();
+  return (
+    <div className="space-y-2">
+      <Msg msg={msg} />
+      <button type="button" disabled={pending} onClick={() => run(() => recordCashAction(orderId))} className="w-full rounded-full bg-success px-4 py-2.5 font-semibold text-white hover:opacity-90 disabled:opacity-50">
+        {pending ? "Saving…" : `Mark ${totalLabel} cash received`}
+      </button>
     </div>
   );
 }

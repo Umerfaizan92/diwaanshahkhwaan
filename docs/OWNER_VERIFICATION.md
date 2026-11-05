@@ -5,7 +5,7 @@ Most items are changed in the dashboard (no code needed). The location is shown 
 
 ## Business details (Admin → Settings)
 
-- [ ] Name for the **0469 975 901** contact (currently shown without a name). 0452 401 786 is Sayed Hasnain Shah.
+- [x] Single public contact: 0452 401 786 (Sayed Hasnain Shah).
 - [ ] Legal or trading entity name for receipts, and the **ABN**.
 - [ ] Business email address (shown on receipts and the privacy policy).
 - [ ] **Exact pickup address.** It is only shown to customers after they pay. Until it's set, confirmations say

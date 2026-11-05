@@ -18,10 +18,11 @@ export async function generateMetadata({ params }: PageProps<"/menu/[slug]">): P
   const dish = await getDishBySlug(slug);
   if (!dish) return { title: "Dish not found" };
   return {
-    title: dish.name,
+    title: `${dish.name} | Pickup in Langford, Perth`,
     description: `${dish.shortDescription}. ${formatCentsShort(dish.priceCents)} — order ahead for pickup in Langford WA.`,
     alternates: { canonical: `/menu/${dish.slug}` },
     openGraph: dish.image ? { images: [{ url: dish.image, alt: dish.imageAlt }] } : undefined,
+    twitter: { card: "summary_large_image" },
   };
 }
 
@@ -70,6 +71,7 @@ export default async function DishPage({ params }: PageProps<"/menu/[slug]">) {
           <h1 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">{dish.name}</h1>
           <div className="mt-3 flex flex-wrap items-center gap-4">
             <span className="font-display text-2xl text-gold">{formatCentsShort(dish.priceCents)}</span>
+            {settings.gstRegistered && settings.gstMode === "ADD_ON" ? <span className="text-sm text-muted">+ GST</span> : null}
             {dish.portion ? <span className="text-muted">{dish.portion}</span> : null}
             <SpiceMeter level={dish.spiceLevel} />
           </div>

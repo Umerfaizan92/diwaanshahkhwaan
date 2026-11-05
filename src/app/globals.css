@@ -112,6 +112,62 @@ a {
   background-clip: text;
 }
 
+/* Sections that sit on photography always use the dark palette, whatever the site theme */
+.on-dark,
+:root[data-theme="light"] .on-dark {
+  color-scheme: dark;
+  --bg: #17110d;
+  --bg-raised: #221a15;
+  --bg-sunken: #100c09;
+  --line: #3a2d22;
+  --text: #f2e8d5;
+  --text-muted: #cdbd9f;
+  --gold: #d9b45a;
+  --gold-bright: #f0d07a;
+  --gold-ink: #1a1209;
+  --focus: #f3d68a;
+}
+:root .on-dark .gold-leaf,
+:root[data-theme="light"] .on-dark .gold-leaf {
+  background: linear-gradient(180deg, #fbe7a6 0%, #e7c160 45%, #c99a3e 75%, #f3d68a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero-shadow {
+  text-shadow: 0 2px 18px rgb(0 0 0 / 0.75), 0 1px 3px rgb(0 0 0 / 0.6);
+}
+.hero-shadow .gold-leaf {
+  filter: drop-shadow(0 2px 10px rgb(0 0 0 / 0.7));
+  text-shadow: none;
+}
+
+/* Hero slideshow: each slide fades in, pushes in slowly, then hands over */
+.hero-slide {
+  opacity: 0;
+  animation: hero-slide calc(var(--slides) * var(--slide-s)) linear infinite both;
+}
+@keyframes hero-slide {
+  0% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+  5% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 1;
+  }
+  26% {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+}
+
 /* Mughal arch mask: cusped top used on dish frames */
 .arch {
   border-radius: 999px 999px 14px 14px / 46% 46% 14px 14px;
@@ -266,6 +322,12 @@ a {
   will-change: transform;
 }
 @media (prefers-reduced-motion: reduce) {
+  .hero-slide {
+    animation: none !important;
+  }
+  .hero-slide:first-child {
+    opacity: 1;
+  }
   .hero-push,
   .arch-draw,
   .rise,

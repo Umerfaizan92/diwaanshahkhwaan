@@ -17,7 +17,7 @@ Status key: ✅ done and verified · 🟡 in progress · ⬜ not started
 ## Business facts captured
 
 - Name: DSK · Diwaan Shah Khwaan — "Taste the Royalty" / "Royal flavours served with love"
-- Orders and enquiries: **0452 401 786 (Sayed Hasnain Shah)** and **0469 975 901**
+- Orders and enquiries: **0452 401 786 (Sayed Hasnain Shah)** — the only published number
 - Pickup: **Langford WA 6147 area** (the exact address is only sent with paid order confirmations)
 - Timezone Australia/Perth; currency AUD
 - Menu and prices: transcribed from the Introductory Price List (31 dishes, 7 categories)
@@ -100,3 +100,18 @@ Status key: ✅ done and verified · 🟡 in progress · ⬜ not started
   hidden from search engines). Code: https://github.com/Umerfaizan92/diwaanshahkhwaan (auto-deploys on push to main).
 - To enable the dashboard sign-in, set SEED_OWNER_EMAIL and SEED_OWNER_PASSWORD (12+ chars) on the Render service.
 - Owner items: `OWNER_VERIFICATION.md`. Regulatory items: `COMPLIANCE.md`. Go-live blockers: `READINESS_REPORT.md`.
+
+## Update — 6 Nov 2026 (owner change list)
+- Single contact number everywhere (0452 401 786); unused brand images containing old numbers deleted
+- 502 fix: server-side image optimisation turned off (it ran the free 512MB instance out of memory); pre-sized WebP files; memory caps (NODE_OPTIONS, MALLOC_ARENA_MAX); direct node start
+- Cinematic hero: six real kitchen photos cross-fading with a slow push-in; always high-contrast (fixed light mode)
+- Homepage "Customer favourites" auto-playing carousel (pause/play, prev/next, swipe, pauses on hover/focus, off with reduced motion)
+- Stock photos (Pexels, free licence) for dishes without photos, labelled "Serving suggestion"; falls back to placeholder if the host is unreachable
+- Test-mode ribbon removed; footer: copyright + "Website designed and managed by Faizan Sabir"
+- Payment choice at checkout: card (Stripe hosted checkout) or cash at pickup; owner records cash in the dashboard
+- 10% GST added on top of the order total (Subtotal + GST = Total) everywhere, including Stripe line items and receipts
+- Confirmation email = full receipt with pickup address (25 Osten Dr, Langford WA 6147); customer confirmation SMS (opt-in)
+- Owner alerted immediately for every new order by email and SMS
+- Owner-only dashboard: edit dish names, prices, photos (upload straight from the dish page) live; automatic customer history with order counts and repeat badges; automatic "Most loved" ranking and badges from real orders
+- SEO: WebSite schema, areas served, keywords, verification tags, social profile links; see docs/SEO_AND_BACKLINKS.md
+- Tests: 97 unit/integration, 21 end-to-end (incl. axe WCAG 2.2 AA in both themes and overflow at 320–1440px)

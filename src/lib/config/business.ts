@@ -9,13 +9,14 @@ export const BUSINESS_DEFAULTS = {
   tagline: "Taste the Royalty",
   strapline: "Royal flavours served with love",
   pickupArea: "Langford WA 6147",
+  /** Private: only shown on paid/confirmed orders, receipts and confirmation emails */
+  pickupAddress: "25 Osten Dr, Langford WA 6147",
   pickupInstructions:
     "Please arrive within your pickup time, and call us if you are running late.",
   timezone: "Australia/Perth",
   currency: "AUD",
   contacts: [
     { name: "Sayed Hasnain Shah", phone: "0452 401 786", role: "Orders, enquiries & pickup" },
-    { name: null, phone: "0469 975 901", role: "Orders & enquiries" }, // VERIFY: contact name
   ] as { name: string | null; phone: string; role: string }[],
 } as const;
 

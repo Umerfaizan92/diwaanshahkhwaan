@@ -54,7 +54,7 @@ let mediumId = "";
 beforeAll(async () => {
   db = await resetDb();
   setPaymentProviderForTests(provider);
-  await db.update(schema.businessSettings).set({ minNoticeHours: 0, orderCutoffTime: null, maxAdvanceDays: 30, notifyOwnerNewOrder: true, ownerNotifyEmail: "owner@dsk.example", reminderHoursBefore: 3, notifySmsEnabled: true, pickupAddress: "12 Example St, Langford WA 6147" });
+  await db.update(schema.businessSettings).set({ minNoticeHours: 0, orderCutoffTime: null, maxAdvanceDays: 30, notifyOwnerNewOrder: true, ownerNotifyEmail: "owner@dsk.example", reminderHoursBefore: 3, notifySmsEnabled: true, pickupAddress: "12 Example St, Langford WA 6147", notifyOwnerSms: false });
   await db.update(schema.openingHours).set({ isOpen: true, openTime: "00:00", closeTime: "23:30" });
   const b = await db.query.menuItems.findFirst({ where: eq(schema.menuItems.slug, "shahi-chicken-biryani"), with: { optionGroups: { with: { choices: true } } } });
   biryaniId = b!.id;
@@ -116,8 +116,10 @@ describe("queueing", () => {
     const { order } = await paidOrder(true);
     for (const to of ["CONFIRMED", "PREPARING", "READY"] as const) await staffTransition(owner, order.id, to, null, db);
     await processNotificationJobs({ db });
-    expect(sms.sent).toHaveLength(1);
-    expect(sms.sent[0].body).toMatch(/READY/);
+    // Opted-in customers get a confirmation text and a "ready" text
+    expect(sms.sent).toHaveLength(2);
+    expect(sms.sent.some((m) => /confirmed/.test(m.body))).toBe(true);
+    expect(sms.sent.some((m) => /READY/.test(m.body))).toBe(true);
     expect(email.sent.some((e) => /ready to collect/.test(e.subject))).toBe(true);
   });
 
@@ -135,6 +137,34 @@ describe("queueing", () => {
     await refundOrder(owner, { orderId: order.id, amountCents: 200, reason: "", idempotencyKey: randomUUID().replace(/-/g, ""), cancelOrder: false }, db);
     await refundOrder(owner, { orderId: order.id, amountCents: 300, reason: "", idempotencyKey: randomUUID().replace(/-/g, ""), cancelOrder: false }, db);
     expect((await jobs()).filter((j) => j.template === "order_partially_refunded")).toHaveLength(2);
+  });
+});
+
+describe("owner alerts and cash orders", () => {
+  it("texts the owner about every new order straight away", async () => {
+    await db.update(schema.businessSettings).set({ notifyOwnerSms: true, ownerNotifyPhone: "0452 401 786" });
+    try {
+      await paidOrder();
+      await processNotificationJobs({ db });
+      const ownerText = sms.sent.find((m) => m.to === "0452 401 786");
+      expect(ownerText?.body).toMatch(/NEW ORDER DSK-/);
+      expect(email.sent.some((e) => e.to === "owner@dsk.example")).toBe(true);
+    } finally {
+      await db.update(schema.businessSettings).set({ notifyOwnerSms: false });
+    }
+  });
+
+  it("a cash order is booked at once, emails a receipt with the pickup address and alerts the owner", async () => {
+    const date = new Date(Date.now() + 2 * 86400_000).toISOString().slice(0, 10);
+    const r = await createReservation({ idempotencyKey: randomUUID().replace(/-/g, ""), lines: [{ menuItemId: biryaniId, quantity: 2, choiceIds: [mediumId] }], name: "Ali", email: "ali@example.com", phone: "0411 222 333", pickupDate: date, pickupTime: "18:00", acceptTerms: true, paymentMethod: "CASH" }, { db });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.order).toMatchObject({ status: "NEW", paymentMethod: "CASH", holdExpiresAt: null, paidAt: null });
+    await processNotificationJobs({ db });
+    const receipt = email.sent.find((e) => e.to === "ali@example.com")!;
+    expect(receipt.html).toContain("12 Example St");
+    expect(receipt.html).toMatch(/in cash when you pick up/);
+    expect(email.sent.find((e) => e.to === "owner@dsk.example")!.html).toMatch(/Cash at pickup/);
   });
 });
 

@@ -8,7 +8,7 @@ import { appUrl } from "@/lib/config/app-url";
 
 export type OrderNotice = "order_confirmed" | "order_accepted" | "order_ready" | "order_cancelled" | "order_refunded" | "order_partially_refunded" | "pickup_reminder";
 
-const SMS_KINDS: OrderNotice[] = ["order_ready", "order_cancelled", "pickup_reminder"];
+const SMS_KINDS: OrderNotice[] = ["order_confirmed", "order_ready", "order_cancelled", "pickup_reminder"];
 /** Retry backoff after attempt n (minutes) */
 const BACKOFF_MIN = [1, 5, 15, 60, 180];
 
@@ -35,7 +35,9 @@ export async function notifyOrder(db: DbOrTx, orderId: string, kind: OrderNotice
   if (s.notifySmsEnabled && order.smsOptIn && SMS_KINDS.includes(kind)) jobs.push({ dedupeKey: `${kind}:${orderId}${suffix}:SMS`, channel: "SMS", template: kind, recipient: order.customerPhone, orderId, payload: data });
 
   if (kind === "order_confirmed") {
+    // The owner hears about every new order straight away, by email and by text
     if (s.notifyOwnerNewOrder && s.ownerNotifyEmail) jobs.push({ dedupeKey: `owner_new_order:${orderId}:EMAIL`, channel: "EMAIL", template: "owner_new_order", recipient: s.ownerNotifyEmail, orderId });
+    if (s.notifyOwnerNewOrder && s.notifyOwnerSms && s.ownerNotifyPhone) jobs.push({ dedupeKey: `owner_new_order:${orderId}:SMS`, channel: "SMS", template: "owner_new_order", recipient: s.ownerNotifyPhone, orderId });
     if (s.reminderHoursBefore > 0) {
       const runAt = new Date(order.pickupAt.getTime() - s.reminderHoursBefore * 3600_000);
       if (runAt.getTime() > Date.now() + 30 * 60_000) {
@@ -116,7 +118,7 @@ export async function processNotificationJobs(opts: { now?: Date; limit?: number
           continue;
         }
       }
-      const channelOn = job.channel === "EMAIL" ? settings.notifyEmailEnabled || job.template === "test" || job.template === "owner_new_order" : settings.notifySmsEnabled;
+      const channelOn = job.channel === "EMAIL" ? settings.notifyEmailEnabled || job.template === "test" || job.template === "owner_new_order" : settings.notifySmsEnabled || job.template === "owner_new_order";
       if (!channelOn) {
         await finish({ status: "CANCELLED", lastError: `${job.channel} notifications are switched off` });
         result.skipped++;

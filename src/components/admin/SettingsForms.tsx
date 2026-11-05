@@ -20,6 +20,9 @@ type S = {
   pickupInstructions: string | null;
   announcement: string | null;
   gstRegistered: boolean;
+  gstMode: "INCLUSIVE" | "ADD_ON";
+  acceptCash: boolean;
+  acceptCard: boolean;
 };
 
 export function BusinessSettingsForm({ initial }: { initial: S }) {
@@ -95,11 +98,34 @@ export function BusinessSettingsForm({ initial }: { initial: S }) {
         <span className="text-sm">
           <strong>Registered for GST</strong>
           <span className="block text-muted">
-            When on (with an ABN), receipts become tax invoices and GST is calculated per dish using each dish&apos;s GST setting. Confirm your registration and each dish&apos;s
-            treatment with your accountant or the ATO before switching this on.
+            When on (with an ABN), receipts become tax invoices and GST is calculated per dish using each dish&apos;s GST setting. Only charge GST if you are registered.
+            Confirm your registration and each dish&apos;s treatment with your accountant or the ATO.
           </span>
         </span>
       </label>
+      <fieldset className="space-y-2">
+        <legend className="mb-1 font-semibold">How GST is shown</legend>
+        <label className="flex items-start gap-3">
+          <input type="radio" name="gstMode" checked={s.gstMode === "ADD_ON"} onChange={() => set("gstMode", "ADD_ON")} className="mt-1 size-4 accent-[var(--gold)]" />
+          <span>Add 10% GST on top of menu prices at checkout (Subtotal + GST = Total)</span>
+        </label>
+        <label className="flex items-start gap-3">
+          <input type="radio" name="gstMode" checked={s.gstMode === "INCLUSIVE"} onChange={() => set("gstMode", "INCLUSIVE")} className="mt-1 size-4 accent-[var(--gold)]" />
+          <span>Menu prices already include GST</span>
+        </label>
+      </fieldset>
+      <fieldset className="space-y-2">
+        <legend className="mb-1 font-semibold">Payment options at checkout</legend>
+        <label className="flex items-center gap-3">
+          <Switch checked={s.acceptCard} onChange={(v) => set("acceptCard", v)} label="Card payments" />
+          Pay by card (Stripe secure checkout, paid into your bank account)
+        </label>
+        <label className="flex items-center gap-3">
+          <Switch checked={s.acceptCash} onChange={(v) => set("acceptCash", v)} label="Cash at pickup" />
+          Cash at pickup
+        </label>
+        {errors.acceptCard ? <p className="text-sm text-danger">{errors.acceptCard}</p> : null}
+      </fieldset>
       <Button type="submit" disabled={pending}>
         {pending ? "Saving…" : "Save business settings"}
       </Button>
@@ -107,7 +133,15 @@ export function BusinessSettingsForm({ initial }: { initial: S }) {
   );
 }
 
-type N = { notifyEmailEnabled: boolean; notifySmsEnabled: boolean; notifyOwnerNewOrder: boolean; ownerNotifyEmail: string | null; reminderHoursBefore: number };
+type N = {
+  notifyEmailEnabled: boolean;
+  notifySmsEnabled: boolean;
+  notifyOwnerNewOrder: boolean;
+  ownerNotifyEmail: string | null;
+  ownerNotifyPhone: string | null;
+  notifyOwnerSms: boolean;
+  reminderHoursBefore: number;
+};
 
 export function NotificationSettingsForm({ initial, emailConfigured, smsConfigured }: { initial: N; emailConfigured: boolean; smsConfigured: boolean }) {
   const [n, setN] = useState(initial);
@@ -117,7 +151,7 @@ export function NotificationSettingsForm({ initial, emailConfigured, smsConfigur
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        run(() => saveNotificationSettingsAction({ ...n, ownerNotifyEmail: n.ownerNotifyEmail ?? "" }));
+        run(() => saveNotificationSettingsAction({ ...n, ownerNotifyEmail: n.ownerNotifyEmail ?? "", ownerNotifyPhone: n.ownerNotifyPhone ?? "" }));
       }}
       className="space-y-4"
     >
@@ -132,12 +166,19 @@ export function NotificationSettingsForm({ initial, emailConfigured, smsConfigur
         Text customers who opt in {smsConfigured ? "" : "(SMS provider not configured)"}
       </label>
       <label className="flex items-center gap-3">
-        <Switch checked={n.notifyOwnerNewOrder} onChange={(v) => set("notifyOwnerNewOrder", v)} label="Email me new orders" />
-        Email me when a new order is paid
+        <Switch checked={n.notifyOwnerNewOrder} onChange={(v) => set("notifyOwnerNewOrder", v)} label="Alert me about new orders" />
+        Alert me straight away about every new order (card or cash)
+      </label>
+      <label className="flex items-center gap-3">
+        <Switch checked={n.notifyOwnerSms} onChange={(v) => set("notifyOwnerSms", v)} label="Text me new orders" disabled={!smsConfigured} />
+        Also text my mobile {smsConfigured ? "" : "(SMS provider not configured yet)"}
       </label>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field id="oe" label="Send new-order emails to" error={errors.ownerNotifyEmail}>
           <Input id="oe" type="email" value={n.ownerNotifyEmail ?? ""} onChange={(e) => set("ownerNotifyEmail", e.target.value)} />
+        </Field>
+        <Field id="op" label="Send new-order texts to" error={errors.ownerNotifyPhone}>
+          <Input id="op" type="tel" value={n.ownerNotifyPhone ?? ""} onChange={(e) => set("ownerNotifyPhone", e.target.value)} placeholder="04xx xxx xxx" />
         </Field>
         <Field id="rh" label="Pickup reminder (hours before)" hint="0 turns reminders off">
           <Input id="rh" type="number" min={0} max={48} value={n.reminderHoursBefore} onChange={(e) => set("reminderHoursBefore", Number(e.target.value) || 0)} />

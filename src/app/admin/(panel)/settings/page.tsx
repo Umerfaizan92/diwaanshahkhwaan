@@ -26,6 +26,9 @@ export default async function SettingsPage() {
             pickupInstructions: s.pickupInstructions,
             announcement: s.announcement,
             gstRegistered: s.gstRegistered,
+            gstMode: s.gstMode,
+            acceptCash: s.acceptCash,
+            acceptCard: s.acceptCard,
           }}
         />
       </Panel>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { requireStaffPage } from "@/lib/server/auth";
 import { attentionOrders, boardOrders, dashboardStats } from "@/lib/server/admin-orders";
 import { adminMenu } from "@/lib/server/menu-admin";
+import { getPublicMenu, MOST_LOVED_MIN_UNITS, POPULAR_WINDOW_DAYS } from "@/lib/server/menu";
 import { getSettings } from "@/lib/server/settings";
 import { can } from "@/lib/domain/permissions";
 import { addDays, formatDateShort, toZoned } from "@/lib/domain/time";
@@ -19,7 +20,12 @@ export default async function AdminHome({ searchParams }: PageProps<"/admin">) {
   const sp = await searchParams;
   const s = await getSettings();
   const today = toZoned(new Date(), s.timezone).date;
-  const [stats, attention, next, menu] = await Promise.all([dashboardStats(today, s.timezone), attentionOrders(), boardOrders({ from: today, to: addDays(today, 1) }), adminMenu()]);
+  const [stats, attention, next, menu, publicMenu] = await Promise.all([dashboardStats(today, s.timezone), attentionOrders(), boardOrders({ from: today, to: addDays(today, 1) }), adminMenu(), getPublicMenu()]);
+  const ranking = publicMenu
+    .flatMap((c) => c.dishes)
+    .filter((d) => d.orderedCount > 0)
+    .sort((a, b) => b.orderedCount - a.orderedCount)
+    .slice(0, 8);
   const upcoming = next.filter((o) => ["NEW", "CONFIRMED", "PREPARING", "READY"].includes(o.status)).slice(0, 12);
   const live = menu.flatMap((c) => c.items).filter((i) => !i.isArchived);
   const showMoney = can(user.role, "reports:view");
@@ -92,6 +98,26 @@ export default async function AdminHome({ searchParams }: PageProps<"/admin">) {
             <Link href="/admin/menu" className="mt-3 inline-block text-sm text-gold underline">
               Manage menu
             </Link>
+          </Panel>
+          <Panel title="Most loved dishes">
+            <p className="mb-3 text-sm text-muted">
+              Ranked automatically from orders in the last {POPULAR_WINDOW_DAYS} days. The top dishes (with at least {MOST_LOVED_MIN_UNITS} ordered) get a &ldquo;Most loved&rdquo; badge on the website and lead the homepage carousel.
+            </p>
+            {ranking.length ? (
+              <ol className="space-y-1.5 text-sm">
+                {ranking.map((d, i) => (
+                  <li key={d.id} className="flex items-center justify-between gap-2">
+                    <span>
+                      <span className="mr-2 tabular-nums text-muted">{i + 1}.</span>
+                      {d.name} {d.isMostLoved ? <Badge tone="gold">Most loved</Badge> : null}
+                    </span>
+                    <span className="tabular-nums text-muted">{d.orderedCount} ordered</span>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="text-sm text-muted">No orders yet. This fills in by itself as orders come in.</p>
+            )}
           </Panel>
         </div>
       </div>

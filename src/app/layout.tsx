@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { TestModeRibbon } from "@/components/site/TestModeRibbon";
 import { appUrl } from "@/lib/config/app-url";
 
 // Self-hosted and preloaded; size-adjusted fallbacks avoid layout shift while they load
@@ -25,6 +24,16 @@ export const metadata: Metadata = {
     siteName: "Diwaan Shah Khwaan",
     images: [{ url: "/images/dishes/bbq-platter-closeup.webp", width: 1200, height: 1600, alt: "Shahi BBQ platter" }],
   },
+  twitter: { card: "summary_large_image" },
+  keywords: ["Pakistani food Perth", "biryani Langford", "karahi Perth", "BBQ platters Perth", "halal takeaway Langford", "home-cooked food Perth", "Diwaan Shah Khwaan", "DSK"],
+  category: "food",
+  authors: [{ name: "Faizan Sabir" }],
+  creator: "Faizan Sabir",
+  publisher: "Diwaan Shah Khwaan",
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
+    other: process.env.BING_SITE_VERIFICATION ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION } : undefined,
+  },
   formatDetection: { telephone: true },
 };
 
@@ -45,10 +54,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en-AU" suppressHydrationWarning className={`${cinzel.variable} ${figtree.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        {/* Stock dish photos come from this host: open the connection early */}
+        <link rel="preconnect" href="https://images.pexels.com" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://images.pexels.com" />
       </head>
       <body className="min-h-dvh">
         {children}
-        <TestModeRibbon />
       </body>
     </html>
   );

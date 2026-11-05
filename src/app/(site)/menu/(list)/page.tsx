@@ -8,7 +8,7 @@ import { menuLd } from "@/lib/server/structured-data";
 
 export const metadata: Metadata = {
   title: "Menu",
-  description: "Biryani, karahi, Shahi BBQ platters, savouries, vegetarian specials and desserts. Order ahead for pickup in Langford WA.",
+  description: "Pakistani menu in Langford, Perth: chicken biryani, karahi, Shahi BBQ platters, burgers, wraps and desserts. Order online for pickup, pay by card or cash.",
   alternates: { canonical: "/menu" },
 };
 
@@ -23,6 +23,7 @@ export default async function MenuPage() {
           <>
             Cooked fresh for each order. Choose your dishes, then pick a pickup time at checkout — we need at least{" "}
             {settings.minNoticeHours} hours&apos; notice.
+            {settings.gstRegistered && settings.gstMode === "ADD_ON" ? " Prices shown are before GST; 10% GST is added at checkout." : null}
           </>
         }
       />

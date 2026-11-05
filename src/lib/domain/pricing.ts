@@ -38,6 +38,7 @@ export type Quote = {
   gstCents: number;
   totalCents: number;
   itemCount: number;
+  gstMode: "INCLUSIVE" | "ADD_ON";
 };
 
 export const MAX_LINES = 40;
@@ -52,7 +53,13 @@ export function lineKey(menuItemId: string, choiceIds: string[]): string {
  * never silently "fixed" into something the customer didn't choose.
  * Prices are GST-inclusive; GST is only reported when the business is registered.
  */
-export function priceCart(input: CartLineInput[], catalog: Map<string, CatalogItem>, opts: { gstRegistered: boolean }): Quote {
+export type GstOptions = { gstRegistered: boolean; gstMode?: "INCLUSIVE" | "ADD_ON" };
+
+/** GST rate used when GST is added on top of menu prices */
+export const GST_RATE = 0.1;
+
+export function priceCart(input: CartLineInput[], catalog: Map<string, CatalogItem>, opts: GstOptions): Quote {
+  const addOn = opts.gstRegistered && opts.gstMode === "ADD_ON";
   const errors: LineError[] = [];
   const merged = new Map<string, CartLineInput>();
 
@@ -144,7 +151,7 @@ export function priceCart(input: CartLineInput[], catalog: Map<string, CatalogIt
       unitPriceCents: unit,
       lineTotalCents: lineTotal,
       gstTreatment: item.gstTreatment,
-      gstCents: taxable ? gstFromInclusive(lineTotal) : 0,
+      gstCents: taxable ? (addOn ? Math.round(lineTotal * GST_RATE) : gstFromInclusive(lineTotal)) : 0,
     });
   }
 
@@ -153,6 +160,12 @@ export function priceCart(input: CartLineInput[], catalog: Map<string, CatalogIt
     errors.push({ key: "_cart", menuItemId: "", message: `Online orders are limited to ${MAX_ORDER_ITEMS} items. For bigger orders, please contact us.` });
   }
   const subtotal = lines.reduce((s, l) => s + l.lineTotalCents, 0);
+  if (addOn) {
+    // 10% GST on the taxable part of the order total, rounded once to the nearest cent
+    const taxableTotal = lines.filter((l) => l.gstTreatment === "TAXABLE").reduce((s, l) => s + l.lineTotalCents, 0);
+    const gst = Math.round(taxableTotal * GST_RATE);
+    return { lines, errors, subtotalCents: subtotal, gstCents: gst, totalCents: subtotal + gst, itemCount, gstMode: "ADD_ON" };
+  }
   const gst = lines.reduce((s, l) => s + l.gstCents, 0);
-  return { lines, errors, subtotalCents: subtotal, gstCents: gst, totalCents: subtotal, itemCount };
+  return { lines, errors, subtotalCents: subtotal, gstCents: gst, totalCents: subtotal, itemCount, gstMode: "INCLUSIVE" };
 }

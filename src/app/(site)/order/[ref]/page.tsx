@@ -14,6 +14,7 @@ import { formatTime12 } from "@/lib/domain/hours";
 import { CUSTOMER_STEPS, STATUS_LABEL } from "@/lib/domain/order-status";
 import { toTelHref } from "@/lib/config/business";
 import { cancelCheckout, resumePayment } from "./actions";
+import { OrderTotals } from "@/components/shop/OrderTotals";
 
 export const metadata: Metadata = { title: "Your order", robots: { index: false, follow: false } };
 
@@ -24,7 +25,10 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/or
   const [order, settings] = await Promise.all([loadOrderForViewer(ref, token), getSettings()]);
   if (!order) notFound();
 
-  const paid = !!order.paidAt;
+  const cash = order.paymentMethod === "CASH";
+  const cashOpen = cash && !["CANCELLED", "REFUNDED", "EXPIRED"].includes(order.status);
+  // "paid" here means the order is confirmed: paid by card, or a live cash-at-pickup order
+  const paid = !!order.paidAt || cashOpen;
   const awaiting = order.status === "PENDING_PAYMENT" || order.status === "PAYMENT_FAILED";
   const holdValid = !!order.holdExpiresAt && order.holdExpiresAt > new Date();
   const stepIndex = CUSTOMER_STEPS.findIndex((s) => s.status === order.status);
@@ -35,6 +39,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/or
   return (
     <Container className="max-w-3xl pb-10 pt-24 lg:pt-32">
       {paid && sp.from === "payment" ? <ClearCartOnPaid reference={order.reference} /> : null}
+      {cash && sp.from === "checkout" ? <ClearCartOnPaid reference={order.reference} /> : null}
       <p className="text-sm text-muted">Order {order.reference}</p>
       <h1 className="mt-1 font-display text-3xl font-semibold sm:text-4xl">
         {paid && order.status === "NEW" ? "Thank you — your order is in" : awaiting ? "Finish paying to confirm" : STATUS_LABEL[order.status]}
@@ -42,6 +47,11 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/or
 
       <div className="mt-6 space-y-4">
         {error ? <Alert tone="error">{error}</Alert> : null}
+        {cashOpen && !order.paidAt ? (
+          <Alert tone="info">
+            <strong>Pay {formatCents(order.totalCents)} in cash when you pick up.</strong> Your confirmation and receipt have been emailed to you.
+          </Alert>
+        ) : null}
         {awaiting && sp.from === "payment" ? <PaymentPending reference={order.reference} token={t} /> : null}
         {order.status === "PAYMENT_FAILED" ? <Alert tone="error">Your payment didn&apos;t go through. No money was taken. You can try again while your pickup time is held.</Alert> : null}
         {awaiting && holdValid ? (
@@ -70,7 +80,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/or
           </Alert>
         ) : null}
         {order.status === "EXPIRED" ? <Alert tone="warning">This order expired before payment was completed, so nothing was charged.</Alert> : null}
-        {order.status === "CANCELLED" ? <Alert tone="warning">This order has been cancelled.{order.refundedCents ? ` ${formatCents(order.refundedCents)} has been refunded to your card.` : ""}</Alert> : null}
+        {order.status === "CANCELLED" ? <Alert tone="warning">This order has been cancelled.{order.refundedCents ? ` ${formatCents(order.refundedCents)} has been refunded${cash ? "" : " to your card"}.` : ""}</Alert> : null}
         {order.status === "REFUNDED" ? <Alert tone="info">{formatCents(order.refundedCents)} has been refunded to your card. Banks usually take 5–10 business days to show it.</Alert> : null}
       </div>
 
@@ -128,18 +138,14 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/or
             </li>
           ))}
         </ul>
-        <dl className="mt-3 space-y-1">
-          {order.gstCents > 0 ? (
-            <div className="flex justify-between text-sm text-muted">
-              <dt>Includes GST</dt>
-              <dd className="tabular-nums">{formatCents(order.gstCents)}</dd>
-            </div>
-          ) : null}
-          <div className="flex justify-between text-lg font-semibold">
-            <dt>Total{paid ? " paid" : ""}</dt>
-            <dd className="tabular-nums text-gold">{formatCents(order.totalCents)}</dd>
-          </div>
-        </dl>
+        <OrderTotals
+          className="mt-3"
+          size="md"
+          subtotalCents={order.subtotalCents}
+          gstCents={order.gstCents}
+          totalCents={order.totalCents}
+          totalLabel={cash ? (order.paidAt ? "Total paid (cash)" : "Total to pay in cash at pickup") : order.paidAt ? "Total paid by card" : "Total"}
+        />
       </section>
 
       <div className="mt-8 flex flex-wrap gap-3">

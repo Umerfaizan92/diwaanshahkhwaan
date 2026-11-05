@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getPublicMenu } from "@/lib/server/menu";
 import { appUrl } from "@/lib/config/app-url";
+import { absUrl } from "@/lib/server/structured-data";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let dishes: MetadataRoute.Sitemap = [];
   try {
     const menu = await getPublicMenu();
-    dishes = menu.flatMap((c) => c.dishes).map((d) => ({ url: `${base}/menu/${d.slug}`, lastModified: now, changeFrequency: "weekly" as const, priority: 0.7, images: d.image ? [`${base}${d.image}`] : undefined }));
+    dishes = menu.flatMap((c) => c.dishes).map((d) => ({ url: `${base}/menu/${d.slug}`, lastModified: now, changeFrequency: "weekly" as const, priority: 0.7, images: d.image ? [absUrl(d.image)] : undefined }));
   } catch {
     /* database unavailable: still serve the static pages */
   }

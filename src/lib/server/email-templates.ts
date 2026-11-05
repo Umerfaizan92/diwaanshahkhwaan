@@ -43,13 +43,24 @@ Questions? Call or text ${phones}<br>Pickup: ${esc(s.pickupArea)}${s.abn ? `<br>
 </td></tr></table></td></tr></table></body></html>`;
 }
 
+/** Receipt table: items, subtotal, GST and total, plus how it was or will be paid */
 function itemsTable(o: TemplateData["order"]) {
   const rows = o.items
     .map((i) => `<tr><td style="padding:8px 0;border-bottom:1px solid #eee4d3">${i.quantity} × ${esc(i.name)}${i.options.length ? `<br><span style="font-size:13px;color:#6d5a45">${esc(i.options.map((x) => x.choice).join(", "))}</span>` : ""}</td><td style="padding:8px 0;border-bottom:1px solid #eee4d3;text-align:right;white-space:nowrap">${formatCents(i.lineTotalCents)}</td></tr>`)
     .join("");
+  const addOn = o.totalCents > o.subtotalCents;
+  const small = (l: string, v: string) => `<tr><td style="padding:4px 0;font-size:14px;color:#6d5a45">${l}</td><td style="padding:4px 0;font-size:14px;color:#6d5a45;text-align:right">${v}</td></tr>`;
+  const cash = o.paymentMethod === "CASH";
+  const totalLabel = cash ? (o.paidAt ? "Total paid (cash)" : "Total to pay in cash at pickup") : "Total paid by card";
   return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="font-size:15px;margin:16px 0">${rows}
-<tr><td style="padding:10px 0;font-weight:bold">Total paid</td><td style="padding:10px 0;text-align:right;font-weight:bold">${formatCents(o.totalCents)}</td></tr>
-${o.gstCents ? `<tr><td style="font-size:13px;color:#6d5a45">Includes GST</td><td style="font-size:13px;color:#6d5a45;text-align:right">${formatCents(o.gstCents)}</td></tr>` : ""}</table>`;
+${addOn ? small("Subtotal", formatCents(o.subtotalCents)) + small("GST (10%)", formatCents(o.gstCents)) : ""}
+<tr><td style="padding:10px 0;font-weight:bold">${totalLabel}</td><td style="padding:10px 0;text-align:right;font-weight:bold">${formatCents(o.totalCents)}</td></tr>
+${!addOn && o.gstCents ? small("Includes GST", formatCents(o.gstCents)) : ""}</table>`;
+}
+
+function receiptMeta(o: TemplateData["order"], s: BusinessSettings) {
+  const placed = new Intl.DateTimeFormat("en-AU", { dateStyle: "medium", timeStyle: "short", timeZone: s.timezone }).format(o.createdAt);
+  return `<p style="font-size:13px;color:#6d5a45;margin:16px 0 0">${s.gstRegistered && s.abn ? "Tax invoice" : "Receipt"} · Order ${esc(o.reference)} · ${esc(placed)}${s.abn ? ` · ABN ${esc(s.abn)}` : ""}<br>Payment: ${o.paymentMethod === "CASH" ? "Cash at pickup" : "Card (Stripe secure checkout)"}</p>`;
 }
 
 const when = (o: Order) => `${formatDateLong(o.pickupDate)} at ${formatTime12(o.pickupTime)}`;
@@ -77,10 +88,20 @@ export function renderTemplate(name: TemplateName, d: TemplateData): Rendered {
   switch (name) {
     case "order_confirmed":
       return {
-        subject: `Order ${o.reference} confirmed — pickup ${formatDateLong(o.pickupDate)}`,
-        html: layout(s, `We've got your order for ${when(o)}.`, `Thank you, ${first} — your order is in`, p(`We've received your payment and your order <strong>${o.reference}</strong> is booked in.`) + pickupBlock(d) + itemsTable(o) + p("We'll email you again when it's ready to collect."), { href: d.orderUrl, label: "View your order" }),
-        text: `Thank you ${o.customerName.split(" ")[0]} — order ${o.reference} is confirmed.\nPickup: ${when(o)}, ${s.pickupAddress ?? s.pickupArea}\nTotal paid: ${formatCents(o.totalCents)}\nView your order: ${d.orderUrl}`,
-        sms: `${s.businessName}: order ${o.reference} confirmed for ${when(o)}. ${d.orderUrl}`,
+        subject: `Order ${o.reference} confirmed: your receipt and pickup details`,
+        html: layout(
+          s,
+          `We've got your order for ${when(o)}.`,
+          `Thank you, ${first}. Your order is in`,
+          p(o.paymentMethod === "CASH" ? `Your order <strong>${o.reference}</strong> is booked in. Please bring <strong>${formatCents(o.totalCents)}</strong> in cash when you pick up.` : `We've received your card payment and your order <strong>${o.reference}</strong> is booked in.`) +
+            pickupBlock(d) +
+            itemsTable(o) +
+            receiptMeta(o, s) +
+            p("<br>We'll let you know when it's ready to collect."),
+          { href: d.orderUrl, label: "View your order and receipt" },
+        ),
+        text: `Thank you ${o.customerName.split(" ")[0]}. Order ${o.reference} is confirmed.\nPickup: ${when(o)}, ${s.pickupAddress ?? s.pickupArea}\n${o.totalCents > o.subtotalCents ? `Subtotal: ${formatCents(o.subtotalCents)}\nGST (10%): ${formatCents(o.gstCents)}\n` : ""}Total: ${formatCents(o.totalCents)} (${o.paymentMethod === "CASH" ? "pay cash at pickup" : "paid by card"})\nView your order and receipt: ${d.orderUrl}`,
+        sms: `${s.businessName}: order ${o.reference} confirmed. Pickup ${when(o)} at ${s.pickupAddress ?? s.pickupArea}. Total ${formatCents(o.totalCents)}${o.paymentMethod === "CASH" ? " cash at pickup" : " paid"}. ${d.orderUrl}`,
       };
     case "order_accepted":
       return {
@@ -117,7 +138,7 @@ export function renderTemplate(name: TemplateName, d: TemplateData): Rendered {
       const amt = typeof d.extra.amountCents === "number" ? d.extra.amountCents : o.refundedCents;
       return {
         subject: `Refund of ${formatCents(amt)} for order ${o.reference}`,
-        html: layout(s, `We've refunded ${formatCents(amt)}.`, "Your refund is on its way", p(`We've refunded <strong>${formatCents(amt)}</strong> for order ${o.reference} to the card you paid with.`) + p("Banks usually take 5–10 business days to show refunds."), { href: d.orderUrl, label: "View your order" }),
+        html: layout(s, `We've refunded ${formatCents(amt)}.`, "Your refund is on its way", (o.paymentMethod === "CASH" ? p(`We've refunded <strong>${formatCents(amt)}</strong> in cash for order ${o.reference}.`) : p(`We've refunded <strong>${formatCents(amt)}</strong> for order ${o.reference} to the card you paid with.`) + p("Banks usually take 5–10 business days to show refunds.")), { href: d.orderUrl, label: "View your order" }),
         text: `We've refunded ${formatCents(amt)} for order ${o.reference}. Banks usually take 5–10 business days.`,
         sms: `${s.businessName}: refund of ${formatCents(amt)} for order ${o.reference} processed.`,
       };
@@ -125,9 +146,9 @@ export function renderTemplate(name: TemplateName, d: TemplateData): Rendered {
     case "owner_new_order":
       return {
         subject: `New order ${o.reference}: ${formatCents(o.totalCents)} — ${formatDateLong(o.pickupDate)} ${formatTime12(o.pickupTime)}`,
-        html: layout(s, "A new paid order.", `New order from ${esc(o.customerName)}`, box(`${esc(when(o))}<br>${esc(o.customerName)} · ${esc(o.customerPhone)}${o.notes ? `<br><strong>Note:</strong> ${esc(o.notes)}` : ""}`) + itemsTable(o), { href: d.adminUrl, label: "Open in dashboard" }),
-        text: `New order ${o.reference} from ${o.customerName} (${o.customerPhone}) for ${when(o)}. Total ${formatCents(o.totalCents)}. ${d.adminUrl}`,
-        sms: `New order ${o.reference} ${formatCents(o.totalCents)} for ${when(o)}`,
+        html: layout(s, o.paymentMethod === "CASH" ? "A new cash-at-pickup order." : "A new paid order.", `New order from ${esc(o.customerName)}`, box(`${esc(when(o))}<br>${esc(o.customerName)} · ${esc(o.customerPhone)}<br><strong>${o.paymentMethod === "CASH" ? "Cash at pickup (collect payment)" : "Paid by card"}</strong>${o.notes ? `<br><strong>Note:</strong> ${esc(o.notes)}` : ""}`) + itemsTable(o), { href: d.adminUrl, label: "Open in dashboard" }),
+        text: `New order ${o.reference} from ${o.customerName} (${o.customerPhone}) for ${when(o)}. Total ${formatCents(o.totalCents)} (${o.paymentMethod === "CASH" ? "CASH at pickup" : "paid by card"}). ${d.adminUrl}`,
+        sms: `NEW ORDER ${o.reference}: ${o.customerName} ${o.customerPhone}, ${formatCents(o.totalCents)} ${o.paymentMethod === "CASH" ? "CASH at pickup" : "card PAID"}, pickup ${when(o)}. ${d.adminUrl}`,
       };
   }
 }

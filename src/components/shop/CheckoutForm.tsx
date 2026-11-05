@@ -11,6 +11,7 @@ import { Alert, Field, Input, Textarea } from "@/components/ui/Field";
 import { Button, buttonClass } from "@/components/ui/Button";
 import { useServerQuote } from "./CartView";
 import { PickupPicker } from "./PickupPicker";
+import { OrderTotals } from "./OrderTotals";
 
 type Prefill = { name: string; email: string; phone: string } | null;
 
@@ -22,7 +23,19 @@ function newKey() {
   }
 }
 
-export function CheckoutForm({ prefill, signedIn, smsAvailable }: { prefill: Prefill; signedIn: boolean; smsAvailable: boolean }) {
+export function CheckoutForm({
+  prefill,
+  signedIn,
+  smsAvailable,
+  acceptCash = true,
+  acceptCard = true,
+}: {
+  prefill: Prefill;
+  signedIn: boolean;
+  smsAvailable: boolean;
+  acceptCash?: boolean;
+  acceptCard?: boolean;
+}) {
   const items = useCart();
   const { quote, loading } = useServerQuote(items);
   const [pending, start] = useTransition();
@@ -30,6 +43,7 @@ export function CheckoutForm({ prefill, signedIn, smsAvailable }: { prefill: Pre
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [slotRefresh, setSlotRefresh] = useState(0);
+  const [method, setMethod] = useState<"CARD" | "CASH">(acceptCard ? "CARD" : "CASH");
   const formRef = useRef<HTMLFormElement>(null);
   // A new idempotency key whenever the order details change; the same key for retries of an identical submission
   const keyRef = useRef<{ sig: string; key: string }>({ sig: "", key: "" });
@@ -62,6 +76,7 @@ export function CheckoutForm({ prefill, signedIn, smsAvailable }: { prefill: Pre
       pickupDate: pickup?.date ?? "",
       pickupTime: pickup?.time ?? "",
       smsOptIn: fd.get("smsOptIn") === "on",
+      paymentMethod: method,
       acceptTerms: (fd.get("acceptTerms") === "on") as true,
     };
     const local: Record<string, string> = {};
@@ -132,8 +147,8 @@ export function CheckoutForm({ prefill, signedIn, smsAvailable }: { prefill: Pre
           </Field>
           {smsAvailable ? (
             <label className="flex items-start gap-3 text-[0.95rem]">
-              <input type="checkbox" name="smsOptIn" className="mt-1 size-4 accent-[var(--gold)]" />
-              Text me when my order is ready
+              <input type="checkbox" name="smsOptIn" defaultChecked className="mt-1 size-4 accent-[var(--gold)]" />
+              Text me my order confirmation and when it&apos;s ready
             </label>
           ) : null}
           <div>
@@ -158,11 +173,40 @@ export function CheckoutForm({ prefill, signedIn, smsAvailable }: { prefill: Pre
             ) : null}
           </div>
         </section>
+
+        <fieldset className="min-w-0 space-y-3">
+          <legend className="mb-4 font-display text-2xl">3. Payment</legend>
+          {errors.paymentMethod ? <p className="text-sm font-medium text-danger">{errors.paymentMethod}</p> : null}
+          <div className="grid gap-3 sm:grid-cols-2">
+            {acceptCard ? (
+              <label className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition-colors ${method === "CARD" ? "border-gold bg-gold/10" : "border-line bg-raised hover:border-gold/60"}`}>
+                <input type="radio" name="paymentMethod" value="CARD" checked={method === "CARD"} onChange={() => setMethod("CARD")} className="mt-1 size-4 accent-[var(--gold)]" />
+                <span>
+                  <span className="block font-semibold">Pay by card now</span>
+                  <span className="mt-0.5 block text-sm text-muted">Visa, Mastercard, Amex, Apple Pay or Google Pay on Stripe&apos;s secure, encrypted checkout. Paid straight to our bank account.</span>
+                </span>
+              </label>
+            ) : null}
+            {acceptCash ? (
+              <label className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition-colors ${method === "CASH" ? "border-gold bg-gold/10" : "border-line bg-raised hover:border-gold/60"}`}>
+                <input type="radio" name="paymentMethod" value="CASH" checked={method === "CASH"} onChange={() => setMethod("CASH")} className="mt-1 size-4 accent-[var(--gold)]" />
+                <span>
+                  <span className="block font-semibold">Cash at pickup</span>
+                  <span className="mt-0.5 block text-sm text-muted">Your order is booked straight away. Please bring the exact amount if you can.</span>
+                </span>
+              </label>
+            ) : null}
+          </div>
+          <p className="flex items-center gap-2 text-sm text-muted">
+            <svg viewBox="0 0 16 16" className="size-4 shrink-0 text-success" aria-hidden><path d="M8 1 2 3.5V8c0 3.3 2.6 6.2 6 7 3.4-.8 6-3.7 6-7V3.5L8 1Z" fill="currentColor" opacity=".25" /><path d="m5 8 2 2 4-4" stroke="currentColor" strokeWidth="1.6" fill="none" /></svg>
+            Card details are entered only on Stripe&apos;s PCI-DSS certified page. We never see or store them.
+          </p>
+        </fieldset>
       </div>
 
       <aside aria-labelledby="sum-h" className="h-fit min-w-0 rounded-3xl border border-line bg-raised p-6 lg:sticky lg:top-28">
         <h2 id="sum-h" className="font-display text-xl">
-          3. Review &amp; pay
+          4. Review &amp; {method === "CASH" ? "place order" : "pay"}
         </h2>
         <ul className="mt-4 space-y-2 text-[0.95rem]">
           {(quote?.lines ?? []).map((l) => (
@@ -192,16 +236,19 @@ export function CheckoutForm({ prefill, signedIn, smsAvailable }: { prefill: Pre
           ) : (
             <p className="text-sm text-muted">Choose a pickup time</p>
           )}
-          {quote && quote.gstCents > 0 ? <p className="mt-2 flex justify-between text-sm text-muted"><span>Includes GST</span><span>{formatCents(quote.gstCents)}</span></p> : null}
-          <p className="mt-2 flex items-baseline justify-between">
-            <span className="font-semibold">Total</span>
-            <span className="font-display text-2xl text-gold tabular-nums">{quote ? formatCents(quote.totalCents) : "…"}</span>
-          </p>
+          {quote ? (
+            <OrderTotals className="mt-3" subtotalCents={quote.subtotalCents} gstCents={quote.gstCents} totalCents={quote.totalCents} />
+          ) : (
+            <p className="mt-2 flex items-baseline justify-between">
+              <span className="font-semibold">Total</span>
+              <span className="font-display text-2xl text-gold">…</span>
+            </p>
+          )}
         </div>
         <Button type="submit" size="lg" className="mt-5 w-full" disabled={pending || !quote || cartBlocked}>
-          {pending ? "Holding your time…" : `Pay ${quote ? formatCents(quote.totalCents) : ""}`}
+          {method === "CASH" ? (pending ? "Placing your order…" : `Place order · pay ${quote ? formatCents(quote.totalCents) : ""} at pickup`) : pending ? "Holding your time…" : `Pay ${quote ? formatCents(quote.totalCents) : ""} securely`}
         </Button>
-        <p className="mt-3 text-center text-xs text-muted">You&apos;ll pay on our payment provider&apos;s secure page. We never see your card details.</p>
+        <p className="mt-3 text-center text-xs text-muted">{method === "CASH" ? "You'll get a confirmation and receipt by email straight away." : "Next, you'll pay on Stripe's secure checkout page. We never see your card details."}</p>
         <Link href="/cart" className="mt-3 block text-center text-sm text-muted underline">
           Edit order
         </Link>

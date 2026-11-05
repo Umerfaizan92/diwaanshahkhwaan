@@ -6,6 +6,7 @@ import { formatCents } from "@/lib/domain/money";
 import { formatDateLong } from "@/lib/domain/time";
 import { formatTime12 } from "@/lib/domain/hours";
 import { PrintButton } from "@/components/shop/PrintButton";
+import { OrderTotals } from "@/components/shop/OrderTotals";
 
 export const metadata: Metadata = { title: "Receipt", robots: { index: false, follow: false } };
 
@@ -13,10 +14,12 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<"/
   const { ref } = await params;
   const sp = await searchParams;
   const [order, s] = await Promise.all([loadOrderForViewer(ref, typeof sp.t === "string" ? sp.t : undefined), getSettings()]);
-  if (!order || !order.paidAt) notFound();
+  const cash = order?.paymentMethod === "CASH";
+  const cashOpen = !!order && cash && !["CANCELLED", "REFUNDED", "EXPIRED"].includes(order.status);
+  if (!order || (!order.paidAt && !cashOpen)) notFound();
   // A tax invoice requires GST registration at the time of sale and an ABN
   const taxInvoice = order.gstRegisteredAtOrder && !!s.abn;
-  const issued = new Intl.DateTimeFormat("en-AU", { dateStyle: "long", timeStyle: "short", timeZone: s.timezone }).format(order.paidAt);
+  const issued = new Intl.DateTimeFormat("en-AU", { dateStyle: "long", timeStyle: "short", timeZone: s.timezone }).format(order.paidAt ?? order.createdAt);
   const taxable = order.items.filter((i) => i.gstTreatment === "TAXABLE");
 
   return (
@@ -32,7 +35,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<"/
           <div className="text-right text-sm">
             <p className="font-semibold">{s.legalName ?? s.businessName}</p>
             {s.abn ? <p>ABN {s.abn}</p> : null}
-            <p>{s.pickupArea}</p>
+            <p>{s.pickupAddress ?? s.pickupArea}</p>
             {s.contacts[0] ? <p>{s.contacts[0].phone}</p> : null}
             {s.email ? <p>{s.email}</p> : null}
           </div>
@@ -67,17 +70,15 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<"/
             ))}
           </tbody>
         </table>
-        <dl className="mt-4 space-y-1 border-t border-line pt-3 text-sm">
-          <div className="flex justify-between text-base font-semibold">
-            <dt>Total paid (AUD)</dt>
-            <dd className="tabular-nums">{formatCents(order.totalCents)}</dd>
-          </div>
-          {taxInvoice ? (
-            <div className="flex justify-between">
-              <dt>Total includes GST of</dt>
-              <dd className="tabular-nums">{formatCents(order.gstCents)}</dd>
-            </div>
-          ) : null}
+        <OrderTotals
+          className="mt-4 border-t border-line pt-3 text-sm"
+          size="md"
+          subtotalCents={order.subtotalCents}
+          gstCents={order.gstCents}
+          totalCents={order.totalCents}
+          totalLabel={cash ? (order.paidAt ? "Total paid in cash (AUD)" : "Total due in cash at pickup (AUD)") : "Total paid (AUD)"}
+        />
+        <dl className="mt-1 space-y-1 text-sm">
           {order.refundedCents ? (
             <div className="flex justify-between text-danger">
               <dt>Refunded</dt>
@@ -87,7 +88,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<"/
         </dl>
         {taxInvoice && taxable.length !== order.items.length ? <p className="mt-3 text-xs text-muted">* Taxable supply. Other items are GST-free.</p> : null}
         {!taxInvoice ? <p className="mt-6 text-xs text-muted">{s.gstRegistered ? "" : "No GST has been charged."} This is a receipt, not a tax invoice.</p> : null}
-        <p className="mt-2 text-xs text-muted">Paid by card through our payment provider.</p>
+        <p className="mt-2 text-xs text-muted">{cash ? (order.paidAt ? "Paid in cash at pickup." : "Payment: cash at pickup.") : "Paid by card through Stripe secure checkout."}</p>
       </div>
       <div className="no-print mt-6 flex justify-center">
         <PrintButton />

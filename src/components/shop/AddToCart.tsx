@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { cardImage } from "@/lib/domain/images";
 import { useId, useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { cart } from "@/lib/client/cart-store";
@@ -59,7 +60,7 @@ export function AddToCart({ dish, acceptingOrders }: { dish: PublicDish; accepti
       menuItemId: dish.id,
       slug: dish.slug,
       name: dish.name,
-      image: dish.image,
+      image: cardImage(dish.image),
       quantity: qty,
       choiceIds: chosen.map((x) => x.c.id),
       optionLabels: chosen.map((x) => (x.c.priceDeltaCents ? `${x.c.name} (+${formatCents(x.c.priceDeltaCents)})` : x.c.name)),

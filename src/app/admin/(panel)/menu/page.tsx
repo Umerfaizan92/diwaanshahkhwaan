@@ -24,7 +24,7 @@ export default async function AdminMenuPage({ searchParams }: PageProps<"/admin/
         title="Menu"
         intro={
           <>
-            {total} dishes{soldOut ? `, ${soldOut} sold out` : ""}. Changes appear on the website straight away. Prices are GST-inclusive.
+            {total} dishes{soldOut ? `, ${soldOut} sold out` : ""}. Change names, prices, photos and availability here: changes appear on the website straight away.
           </>
         }
         actions={

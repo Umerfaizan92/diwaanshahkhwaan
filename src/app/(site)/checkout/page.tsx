@@ -13,7 +13,7 @@ export default async function CheckoutPage() {
     <Container className="pb-10 pt-24 lg:pt-32">
       <h1 className="mb-8 font-display text-3xl font-semibold sm:text-4xl">Checkout</h1>
       {settings.acceptingOrders ? (
-        <CheckoutForm prefill={customer ? { name: customer.name, email: customer.email, phone: customer.phone } : null} signedIn={!!customer} smsAvailable={smsAvailable} />
+        <CheckoutForm prefill={customer ? { name: customer.name, email: customer.email, phone: customer.phone } : null} signedIn={!!customer} smsAvailable={smsAvailable} acceptCash={settings.acceptCash} acceptCard={settings.acceptCard} />
       ) : (
         <p className="rounded-xl border border-warning/50 bg-warning/10 p-4">We&apos;re not taking online orders right now. Please call us to order.</p>
       )}

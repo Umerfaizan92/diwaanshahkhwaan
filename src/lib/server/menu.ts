@@ -1,6 +1,6 @@
 import "server-only";
 import { cache } from "react";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db";
 import { resolveImage } from "@/lib/domain/images";
 
@@ -41,6 +41,9 @@ export type PublicDish = {
   categorySlug: string;
   categoryName: string;
   optionGroups: PublicGroup[];
+  /** Units ordered in recent paid orders (automatic, drives "Most loved") */
+  orderedCount: number;
+  isMostLoved: boolean;
 };
 export type PublicCategory = { id: string; slug: string; name: string; description: string | null; dishes: PublicDish[] };
 
@@ -89,7 +92,38 @@ export function toPublicDish(i: ItemRow): PublicDish {
           .sort((a, b) => a.sortOrder - b.sortOrder)
           .map((c) => ({ id: c.id, name: c.name, priceDeltaCents: c.priceDeltaCents, isDefault: c.isDefault, isAvailable: c.isAvailable })),
       })),
+    orderedCount: 0,
+    isMostLoved: false,
   };
+}
+
+/** Paid orders count towards popularity; unpaid, failed, expired and cancelled ones don't */
+const COUNTED = ["NEW", "CONFIRMED", "PREPARING", "READY", "COLLECTED"] as const;
+export const POPULAR_WINDOW_DAYS = 120;
+export const MOST_LOVED_TOP = 4;
+export const MOST_LOVED_MIN_UNITS = 3;
+
+/** Units ordered per dish over the popularity window. Recomputed on every request, no manual work. */
+export const getPopularity = cache(async (): Promise<Map<string, number>> => {
+  const db = getDb();
+  const rows = await db.execute<{ id: string; units: string }>(sql`
+    select oi.menu_item_id as id, sum(oi.quantity)::text as units
+    from ${schema.orderItems} oi
+    join ${schema.orders} o on o.id = oi.order_id
+    where o.status in (${sql.join(COUNTED.map((c) => sql`${c}`), sql`, `)})
+      and o.created_at > now() - make_interval(days => ${POPULAR_WINDOW_DAYS})
+      and oi.menu_item_id is not null
+    group by oi.menu_item_id`);
+  return new Map(rows.rows.map((r) => [r.id, Number(r.units)]));
+});
+
+function applyPopularity(dishes: PublicDish[], pop: Map<string, number>) {
+  for (const d of dishes) d.orderedCount = pop.get(d.id) ?? 0;
+  const top = [...dishes]
+    .filter((d) => d.orderedCount >= MOST_LOVED_MIN_UNITS)
+    .sort((a, b) => b.orderedCount - a.orderedCount)
+    .slice(0, MOST_LOVED_TOP);
+  for (const d of top) d.isMostLoved = true;
 }
 
 const withRelations = {
@@ -109,7 +143,8 @@ export const getPublicMenu = cache(async (): Promise<PublicCategory[]> => {
     with: withRelations,
     orderBy: [asc(schema.menuItems.sortOrder), asc(schema.menuItems.name)],
   });
-  return cats
+  const pop = await getPopularity();
+  const result = cats
     .map((c) => ({
       id: c.id,
       slug: c.slug,
@@ -118,6 +153,8 @@ export const getPublicMenu = cache(async (): Promise<PublicCategory[]> => {
       dishes: items.filter((i) => i.categoryId === c.id).map((i) => toPublicDish(i as ItemRow)),
     }))
     .filter((c) => c.dishes.length > 0);
+  applyPopularity(result.flatMap((c) => c.dishes), pop);
+  return result;
 });
 
 export const getDishBySlug = cache(async (slug: string): Promise<PublicDish | null> => {
@@ -127,12 +164,23 @@ export const getDishBySlug = cache(async (slug: string): Promise<PublicDish | nu
     with: withRelations,
   });
   if (!item || !item.category.isVisible) return null;
-  return toPublicDish(item as ItemRow);
+  const menu = await getPublicMenu();
+  return menu.flatMap((c) => c.dishes).find((d) => d.id === item.id) ?? toPublicDish(item as ItemRow);
 });
 
 export async function getFeaturedDishes(): Promise<PublicDish[]> {
   const menu = await getPublicMenu();
   return menu.flatMap((c) => c.dishes).filter((d) => d.isFeatured);
+}
+
+/**
+ * Dishes for the homepage carousel: customers' most-ordered dishes first (automatic),
+ * then the owner's featured picks, then anything else with a photo.
+ */
+export async function getFavouriteDishes(limit = 10): Promise<PublicDish[]> {
+  const all = (await getPublicMenu()).flatMap((c) => c.dishes).filter((d) => d.isAvailable);
+  const score = (d: PublicDish) => d.orderedCount * 100 + (d.isFeatured ? 50 : 0) + (d.image ? 10 : 0);
+  return [...all].sort((a, b) => score(b) - score(a)).slice(0, limit);
 }
 
 export async function getDailySpecials(): Promise<PublicDish[]> {

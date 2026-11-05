@@ -8,6 +8,7 @@ import { priceCart } from "@/lib/domain/pricing";
 import { fieldErrors } from "@/lib/domain/validation";
 import type { Order, OrderStatus } from "@/lib/db/schema";
 import { loadCatalog } from "./catalog";
+import { notifyOrder } from "./notifications";
 import { cartNeeds, loadScheduleContext, loadUsage } from "./schedule";
 
 const REF_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // no 0/O/1/I/L
@@ -61,9 +62,12 @@ export async function createReservation(raw: CheckoutInput, opts: { now?: Date; 
 
     const ctx = await loadScheduleContext(tx);
     if (!ctx.settings.acceptingOrders) return { ok: false, code: "CLOSED", error: "We're not taking online orders right now. Please call us to order." };
+    const cash = input.paymentMethod === "CASH";
+    if (cash && !ctx.settings.acceptCash) return { ok: false, code: "INVALID", error: "Cash at pickup isn't available right now. Please pay by card.", fieldErrors: { paymentMethod: "Choose card payment" } };
+    if (!cash && !ctx.settings.acceptCard) return { ok: false, code: "INVALID", error: "Card payment isn't available right now. Please choose cash at pickup.", fieldErrors: { paymentMethod: "Choose cash at pickup" } };
 
     const catalog = await loadCatalog(tx, input.lines.map((l) => l.menuItemId));
-    const quote = priceCart(input.lines, catalog, { gstRegistered: ctx.settings.gstRegistered });
+    const quote = priceCart(input.lines, catalog, { gstRegistered: ctx.settings.gstRegistered, gstMode: ctx.settings.gstMode });
     if (quote.errors.length || !quote.lines.length) {
       return { ok: false, code: "CART", error: quote.errors[0]?.message ?? "Your order is empty", lineErrors: quote.errors.map((e) => ({ key: e.key, message: e.message })) };
     }
@@ -73,7 +77,8 @@ export async function createReservation(raw: CheckoutInput, opts: { now?: Date; 
     const check = checkPickup(input.pickupDate, input.pickupTime, now, ctx.rules, ctx.hours, ctx.closed, needs, usage);
     if (!check.ok) return { ok: false, code: "SLOT", error: check.reason, fieldErrors: { pickupTime: check.reason } };
 
-    const holdExpiresAt = new Date(now.getTime() + ctx.settings.paymentHoldMinutes * 60_000);
+    // Card: hold the slot while the customer pays. Cash: the order is placed straight away.
+    const holdExpiresAt = cash ? null : new Date(now.getTime() + ctx.settings.paymentHoldMinutes * 60_000);
     let order: Order | undefined;
     for (let attempt = 0; attempt < 5 && !order; attempt++) {
       const inserted = await tx
@@ -89,7 +94,8 @@ export async function createReservation(raw: CheckoutInput, opts: { now?: Date; 
           pickupDate: input.pickupDate,
           pickupTime: input.pickupTime,
           pickupAt: check.startsAt,
-          status: "PENDING_PAYMENT",
+          status: cash ? "NEW" : "PENDING_PAYMENT",
+          paymentMethod: cash ? "CASH" : "CARD",
           subtotalCents: quote.subtotalCents,
           gstCents: quote.gstCents,
           totalCents: quote.totalCents,
@@ -117,8 +123,39 @@ export async function createReservation(raw: CheckoutInput, opts: { now?: Date; 
         gstCents: l.gstCents,
       })),
     );
-    await tx.insert(schema.orderEvents).values({ orderId: order.id, fromStatus: null, toStatus: "PENDING_PAYMENT", actor: "customer", note: `Slot held until ${holdExpiresAt.toISOString()}` });
+    if (cash) {
+      await tx.insert(schema.orderEvents).values({ orderId: order.id, fromStatus: null, toStatus: "NEW", actor: "customer", note: "Cash at pickup" });
+      await notifyOrder(tx, order.id, "order_confirmed");
+    } else {
+      await tx.insert(schema.orderEvents).values({ orderId: order.id, fromStatus: null, toStatus: "PENDING_PAYMENT", actor: "customer", note: `Slot held until ${holdExpiresAt!.toISOString()}` });
+    }
     return { ok: true, order, reused: false };
+  });
+}
+
+/**
+ * Records cash taken at pickup as a completed payment, so cash orders appear in payments,
+ * reports and receipts exactly like card orders. Idempotent per order.
+ */
+export async function recordCashPayment(orderId: string, actor: string, db: DB = getDb()): Promise<{ ok: true; message: string } | { ok: false; error: string }> {
+  return db.transaction(async (tx) => {
+    const [order] = await tx.select().from(schema.orders).where(eq(schema.orders.id, orderId)).for("update");
+    if (!order) return { ok: false, error: "Order not found" } as const;
+    if (order.paymentMethod !== "CASH") return { ok: false, error: "This order was paid by card" } as const;
+    if (order.paidAt) return { ok: true, message: "Cash was already recorded for this order" } as const;
+    if (["CANCELLED", "REFUNDED", "EXPIRED", "PAYMENT_FAILED", "PENDING_PAYMENT"].includes(order.status)) return { ok: false, error: "This order isn't active" } as const;
+    const now = new Date();
+    await tx.insert(schema.payments).values({
+      orderId: order.id,
+      provider: "cash",
+      providerSessionId: `cash:${order.id}`,
+      providerPaymentId: `cash:${order.id}`,
+      amountCents: order.totalCents,
+      status: "SUCCEEDED",
+    }).onConflictDoNothing();
+    await tx.update(schema.orders).set({ paidAt: now, cashCollectedAt: now }).where(eq(schema.orders.id, order.id));
+    await tx.insert(schema.orderEvents).values({ orderId: order.id, fromStatus: order.status, toStatus: order.status, actor, note: "Cash received at pickup" });
+    return { ok: true, message: "Cash payment recorded" } as const;
   });
 }
 

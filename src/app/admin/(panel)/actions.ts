@@ -3,6 +3,7 @@
 import { randomUUID } from "node:crypto";
 import { staffAction } from "@/lib/server/action";
 import * as orders from "@/lib/server/admin-orders";
+import { recordCashPayment } from "@/lib/server/orders";
 import * as misc from "@/lib/server/admin-misc";
 import { reconcileOrder, refundOrder } from "@/lib/server/payments";
 import { audit } from "@/lib/server/audit";
@@ -17,6 +18,13 @@ export async function transitionAction(orderId: string, to: OrderStatus, note: s
   const r = await staffAction("orders:view", (u) => orders.staffTransition(u, orderId, to, note));
   if (r.ok) kickNotifications();
   return r;
+}
+export async function recordCashAction(orderId: string) {
+  return staffAction("orders:update", async (u) => {
+    const r = await recordCashPayment(orderId, u.email);
+    if (r.ok) await audit(u, "order.cash_received", "order", orderId, {});
+    return r;
+  });
 }
 export async function clearAttentionAction(orderId: string) {
   return staffAction("orders:update", (u) => orders.clearAttention(u, orderId));

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isRemoteStock } from "./images";
 import { ALLERGEN_OPTIONS } from "./allergens";
 
 const slug = z
@@ -56,7 +57,11 @@ export const menuItemSchema = z.object({
   description: z.string().trim().max(2000),
   portion: z.string().trim().max(40).nullable(),
   priceCents: z.number().int().min(0, "Price can't be negative").max(1_000_000, "Price looks too high"),
-  imagePath: z.string().max(300).nullable(),
+  imagePath: z
+    .string()
+    .max(300)
+    .refine((v) => v.startsWith("media:") || v.startsWith("/images/") || isRemoteStock(v), "Choose a photo from the list")
+    .nullable(),
   imageAlt: z.string().trim().max(200).nullable(),
   isAvailable: z.boolean(),
   isFeatured: z.boolean(),

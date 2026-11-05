@@ -4,6 +4,7 @@ import path from "node:path";
 import { desc } from "drizzle-orm";
 import { getDb, schema } from "@/lib/db";
 import type { ImageOption } from "@/components/admin/MenuItemForm";
+import { STOCK_PHOTOS } from "@/lib/menu/stock-photos";
 
 /** Photos the owner can assign to dishes: bundled kitchen photos plus uploads in the media library */
 export async function listImageOptions(): Promise<ImageOption[]> {
@@ -21,5 +22,6 @@ export async function listImageOptions(): Promise<ImageOption[]> {
     .select({ id: schema.media.id, filename: schema.media.filename, alt: schema.media.alt })
     .from(schema.media)
     .orderBy(desc(schema.media.createdAt));
-  return [...uploads.map((m) => ({ path: `media:${m.id}`, label: `Upload: ${m.alt || m.filename}` })), ...bundled];
+  const stock = Object.entries(STOCK_PHOTOS).map(([slug, p]) => ({ path: p.url, label: `Stock photo: ${slug.replace(/-/g, " ")}` }));
+  return [...uploads.map((m) => ({ path: `media:${m.id}`, label: `Upload: ${m.alt || m.filename}` })), ...bundled, ...stock];
 }

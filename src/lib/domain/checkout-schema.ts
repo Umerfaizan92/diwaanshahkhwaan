@@ -14,6 +14,7 @@ export const checkoutSchema = z.object({
   pickupDate: z.string().refine(isDateString, "Choose a pickup date"),
   pickupTime: z.string().refine(isTimeString, "Choose a pickup time"),
   smsOptIn: z.boolean().default(false),
+  paymentMethod: z.enum(["CARD", "CASH"]).default("CARD"),
   acceptTerms: z.literal(true, { message: "Please accept the terms and refund policy" }),
 });
 export type CheckoutInput = z.input<typeof checkoutSchema>;

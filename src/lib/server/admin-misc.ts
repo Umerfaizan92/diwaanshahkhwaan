@@ -45,11 +45,15 @@ export const settingsSchema = z.object({
   pickupInstructions: z.string().trim().max(500).nullable(),
   announcement: z.string().trim().max(200).nullable(),
   gstRegistered: z.boolean(),
+  gstMode: z.enum(["INCLUSIVE", "ADD_ON"]),
+  acceptCash: z.boolean(),
+  acceptCard: z.boolean(),
 });
 
 export async function saveSettings(actor: StaffUser, raw: unknown, db: DB = getDb()): Promise<ActionResult> {
   const p = settingsSchema.safeParse(raw);
   if (!p.success) return zErr(p.error);
+  if (!p.data.acceptCash && !p.data.acceptCard) return { ok: false, error: "Keep at least one payment method switched on", fieldErrors: { acceptCard: "Choose at least one" } };
   if (p.data.gstRegistered && !p.data.abn) return { ok: false, error: "Add your ABN before switching on GST registration", fieldErrors: { abn: "Required when GST registered" } };
   const [before] = await db.select().from(schema.businessSettings);
   await db.update(schema.businessSettings).set({ ...p.data, contacts: p.data.contacts.map((c) => ({ ...c, name: c.name || null })) }).where(eq(schema.businessSettings.id, 1));
@@ -63,6 +67,8 @@ export const notifySchema = z.object({
   notifySmsEnabled: z.boolean(),
   notifyOwnerNewOrder: z.boolean(),
   ownerNotifyEmail: z.union([z.literal(""), email]).transform((v) => v || null),
+  ownerNotifyPhone: z.union([z.literal(""), auPhone]).transform((v) => v || null),
+  notifyOwnerSms: z.boolean(),
   reminderHoursBefore: z.number().int().min(0).max(48),
 });
 
@@ -127,7 +133,8 @@ export async function updateStaff(actor: StaffUser, id: string, patch: { role?: 
 /* ---------------- Customers ---------------- */
 
 export async function customerList(q: string, db: DB = getDb()) {
-  const where = and(sql`${schema.orders.paidAt} is not null`, q ? or(ilike(schema.orders.customerName, `%${q}%`), ilike(schema.orders.customerEmail, `%${q}%`), ilike(schema.orders.customerPhone, `%${q}%`)) : undefined);
+  // Paid orders, plus live cash-at-pickup orders, count towards a customer's history
+  const where = and(sql`(${schema.orders.paidAt} is not null or (${schema.orders.paymentMethod} = 'CASH' and ${schema.orders.status} not in ('CANCELLED','EXPIRED','REFUNDED')))`, q ? or(ilike(schema.orders.customerName, `%${q}%`), ilike(schema.orders.customerEmail, `%${q}%`), ilike(schema.orders.customerPhone, `%${q}%`)) : undefined);
   return db
     .select({
       email: schema.orders.customerEmail,
@@ -184,7 +191,10 @@ export async function uploadMedia(actor: StaffUser, file: File, alt: string, db:
   const input = Buffer.from(await file.arrayBuffer());
   let out: { data: Buffer; info: { width: number; height: number } };
   try {
-    out = await sharp(input, { limitInputPixels: 50_000_000 }).rotate().resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true }).webp({ quality: 80 }).toBuffer({ resolveWithObject: true });
+    // Low memory: one image at a time, no cache (the free server has 512MB)
+    sharp.concurrency(1);
+    sharp.cache(false);
+    out = await sharp(input, { limitInputPixels: 40_000_000 }).rotate().resize({ width: 1400, height: 1400, fit: "inside", withoutEnlargement: true }).webp({ quality: 80 }).toBuffer({ resolveWithObject: true });
   } catch {
     return { ok: false, error: "That file couldn't be read as an image" };
   }

@@ -105,12 +105,13 @@ describe("business settings", () => {
   it("validates ABNs with the ATO checksum and requires one for GST registration", async () => {
     expect(isValidAbn("51824753556")).toBe(true); // ATO's published example
     expect(isValidAbn("51824753557")).toBe(false);
-    const base = { businessName: "Diwaan Shah Khwaan", legalName: null, tagline: "Taste the Royalty", abn: "", email: "", contacts: [{ name: "Sayed Hasnain Shah", phone: "0452 401 786", role: "Orders" }], pickupArea: "Langford WA 6147", pickupAddress: null, pickupInstructions: null, announcement: null, gstRegistered: true };
+    const base = { businessName: "Diwaan Shah Khwaan", legalName: null, tagline: "Taste the Royalty", abn: "", email: "", contacts: [{ name: "Sayed Hasnain Shah", phone: "0452 401 786", role: "Orders" }], pickupArea: "Langford WA 6147", pickupAddress: null, pickupInstructions: null, announcement: null, gstRegistered: true, gstMode: "ADD_ON" as const, acceptCash: true, acceptCard: true };
     expect((await saveSettings(owner, base, db)).ok).toBe(false);
     expect((await saveSettings(owner, { ...base, abn: "51 824 753 557" }, db)).ok).toBe(false);
     expect((await saveSettings(owner, { ...base, abn: "51824753556", gstRegistered: false }, db)).ok).toBe(true);
     const [s] = await db.select().from(schema.businessSettings);
     expect(s.abn).toBe("51 824 753 556");
+    expect((await saveSettings(owner, { ...base, abn: "51824753556", acceptCash: false, acceptCard: false }, db)).ok).toBe(false);
   });
 });
 
@@ -132,7 +133,7 @@ describe("photo uploads", () => {
     const ok = await uploadMedia(owner, new File([new Uint8Array(png)], "dish.png", { type: "image/png" }), "Test dish", db);
     expect(ok.ok).toBe(true);
     const [m] = await db.select().from(schema.media);
-    expect(m).toMatchObject({ contentType: "image/webp", width: 1600, height: 1200 });
+    expect(m).toMatchObject({ contentType: "image/webp", width: 1400, height: 1050 });
     expect((await uploadMedia(owner, new File([new Uint8Array([1, 2, 3])], "x.png", { type: "image/png" }), "", db)).ok).toBe(false);
     expect((await uploadMedia(owner, new File(["<svg/>"], "x.svg", { type: "image/svg+xml" }), "", db)).ok).toBe(false);
     expect((await uploadMedia(owner, new File([new Uint8Array(9 * 1024 * 1024)], "big.jpg", { type: "image/jpeg" }), "", db)).ok).toBe(false);

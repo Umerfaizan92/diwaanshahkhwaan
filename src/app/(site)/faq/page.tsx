@@ -30,7 +30,7 @@ export default async function FaqPage() {
       ),
     },
     { q: "Why can't I pick a certain time?", a: "Each pickup slot takes a limited number of orders so we can cook everything fresh. If a time isn't shown, it's full or outside our hours." },
-    { q: "How do I pay?", a: "By card through our secure online checkout. We never see or store your card details. Your order is confirmed once payment succeeds." },
+    { q: "How do I pay?", a: "Pay by card through Stripe's secure online checkout (we never see or store your card details), or choose cash and pay when you pick up. 10% GST is added to the order total." },
     { q: "Do I need an account?", a: <>No. You can check out as a guest. With an account, your order history and receipts are in one place — <Link href="/account">sign in or create one</Link>.</> },
     { q: "How do I know my order is ready?", a: "We email you when your order is ready for pickup. You can also follow its progress using the link in your confirmation email." },
     { q: "Can I change or cancel my order?", a: <>Contact us at least {s.cancelDeadlineHours} hours before pickup. See our <Link href="/refunds">refund and cancellation policy</Link>.</> },

@@ -16,6 +16,8 @@ export async function resetDb() {
   delete process.env.SEED_OWNER_EMAIL;
   await seed(TEST_URL, { quiet: true });
   if (owner) process.env.SEED_OWNER_EMAIL = owner;
+  // Baseline for tests: GST off (tests that need GST switch it on explicitly)
+  await db.execute(sql`update business_settings set gst_registered = false, gst_mode = 'INCLUSIVE', accept_cash = true, accept_card = true`);
   return getDb();
 }
 

@@ -68,3 +68,22 @@ test("webhooks reject unsigned requests", async ({ request }) => {
   const c = await request.post("/api/cron/sweep");
   expect(c.status()).toBe(401);
 });
+
+test("cash at pickup: order is booked at once with GST shown, and the owner records the cash", async ({ page, browser }) => {
+  await addToCart(page);
+  await fillCheckout(page);
+  await page.getByText("Cash at pickup", { exact: true }).click();
+  await expect(page.locator("aside").getByText("GST (10%)")).toBeVisible();
+  await page.getByRole("button", { name: /^Place order/ }).click();
+  await expect(page.getByRole("heading", { name: /Thank you/ })).toBeVisible();
+  await expect(page.getByText(/in cash when you pick up/)).toBeVisible();
+  await expect(page.getByText("25 Osten Dr, Langford WA 6147")).toBeVisible();
+  const ref = page.url().match(/DSK-[A-Z2-9]{6}/)![0];
+
+  const owner = await (await browser.newContext()).newPage();
+  await staffLogin(owner);
+  await owner.goto(`/admin/orders?q=${ref}`);
+  await owner.getByRole("link", { name: /E2E Customer/ }).first().click();
+  await owner.getByRole("button", { name: /cash received/ }).click();
+  await expect(owner.getByText("Cash payment recorded")).toBeVisible();
+});

@@ -35,13 +35,15 @@ export default async function TermsPage() {
           </ul>
           <h2>Prices and payment</h2>
           <ul>
-            <li>Prices are in Australian dollars and are the total price payable.</li>
+            <li>Prices are in Australian dollars.</li>
             <li>
               {s.gstRegistered
-                ? "Prices include GST where it applies. A tax invoice is issued for each order."
+                ? s.gstMode === "ADD_ON"
+                  ? "Menu prices are shown before GST. 10% GST is added to taxable items and the full total, including GST, is shown before you place your order."
+                  : "Prices include GST where it applies."
                 : "We are not currently registered for GST, so no GST is charged."}
             </li>
-            <li>Payment is taken online by our payment provider. We never receive or store your full card details.</li>
+            <li>You can pay by card online through our payment provider (Stripe), or in cash when you collect. We never receive or store your full card details. Cash orders must be paid in full at pickup.</li>
           </ul>
           <h2>Pickup</h2>
           <ul>

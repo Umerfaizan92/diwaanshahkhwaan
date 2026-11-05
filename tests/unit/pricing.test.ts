@@ -122,4 +122,16 @@ describe("priceCart", () => {
     expect(reg.totalCents).toBe(2200); // GST-inclusive: total unchanged
     expect(priceCart(lines, catalog, { gstRegistered: false }).gstCents).toBe(0);
   });
+
+  it("adds 10% GST on top of the taxable total when configured", () => {
+    const lines = [
+      { menuItemId: "biryani", quantity: 3, choiceIds: ["mild"] },
+      { menuItemId: "kheer", quantity: 1, choiceIds: [] },
+    ];
+    const q = priceCart(lines, catalog, { gstRegistered: true, gstMode: "ADD_ON" });
+    expect(q.subtotalCents).toBe(4600);
+    expect(q.gstCents).toBe(360); // 10% of the $36 taxable biryani; kheer is GST-free
+    expect(q.totalCents).toBe(4960);
+    expect(priceCart(lines, catalog, { gstRegistered: false, gstMode: "ADD_ON" }).totalCents).toBe(4600);
+  });
 });

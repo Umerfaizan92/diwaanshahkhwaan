@@ -6,43 +6,43 @@ import { MenuPreview } from "@/components/site/MenuPreview";
 import { PickupContact } from "@/components/site/PickupContact";
 import { Container, SectionTitle } from "@/components/site/PageHeader";
 import { buttonClass } from "@/components/ui/Button";
-import { getFeaturedDishes, getPublicMenu } from "@/lib/server/menu";
+import { getFavouriteDishes, getPublicMenu } from "@/lib/server/menu";
+import { DishCarousel } from "@/components/site/DishCarousel";
 import { getOpeningHours, getSettings } from "@/lib/server/settings";
 import { toTelHref } from "@/lib/config/business";
 import { JsonLd } from "@/components/site/JsonLd";
-import { restaurantLd } from "@/lib/server/structured-data";
+import { restaurantLd, websiteLd } from "@/lib/server/structured-data";
 
 const STEPS = [
   { t: "Choose your dishes", d: "Browse the menu and add what you'd like. Pick your spice level where it applies." },
   { t: "Pick a pickup time", d: "Choose a date and time slot. We cook to order, so slots are limited each day." },
-  { t: "Pay securely online", d: "Card payment through a secure, hosted checkout. We never see your card details." },
+  { t: "Pay your way", d: "Pay by card through Stripe's secure checkout, or choose cash and pay when you pick up." },
   { t: "Collect it fresh", d: "We'll email you when it's ready. Pick up from our kitchen in Langford." },
 ];
 
 export default async function HomePage() {
-  const [settings, hours, featured, menu] = await Promise.all([getSettings(), getOpeningHours(), getFeaturedDishes(), getPublicMenu()]);
+  const [settings, hours, featured, menu] = await Promise.all([getSettings(), getOpeningHours(), getFavouriteDishes(), getPublicMenu()]);
 
   return (
     <>
       <JsonLd data={restaurantLd(settings, hours)} />
+      <JsonLd data={websiteLd(settings)} />
       <Hero pickupArea={settings.pickupArea} acceptingOrders={settings.acceptingOrders} />
 
       {/* Signature dishes */}
       <section aria-labelledby="signature" className="py-20 lg:py-28">
         <Container>
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <SectionTitle id="signature" title="From the Shahi kitchen" intro="The dishes people order again and again." />
+            <SectionTitle id="signature" title="Customer favourites" intro="Our most-ordered dishes, updated automatically as orders come in." />
             <Link href="/menu" className={buttonClass("outline", "md", "mb-8 lg:mb-10")}>
               Full menu
             </Link>
           </div>
-          <ul className="rail -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4">
-            {featured.map((d, i) => (
-              <li key={d.id} className="w-[78%] shrink-0 snap-start sm:w-auto">
-                <DishCard dish={d} priority={i < 2} />
-              </li>
+          <DishCarousel label="Customer favourite dishes">
+            {featured.map((d) => (
+              <DishCard key={d.id} dish={d} sizes="(min-width:1024px) 23vw, (min-width:768px) 31vw, (min-width:640px) 44vw, 78vw" />
             ))}
-          </ul>
+          </DishCarousel>
         </Container>
       </section>
 
@@ -105,7 +105,7 @@ export default async function HomePage() {
       {/* Menu preview */}
       <section aria-labelledby="menu-preview" className="border-t border-line/60 py-20 lg:py-24">
         <Container>
-          <SectionTitle id="menu-preview" title="The menu" intro="Prices include everything — no surprises at checkout." />
+          <SectionTitle id="menu-preview" title="The menu" intro="Menu prices are before GST. 10% GST is added to your order total at checkout." />
           <MenuPreview
             categories={menu.map((c) => ({
               slug: c.slug,
@@ -118,7 +118,7 @@ export default async function HomePage() {
       </section>
 
       {/* Bulk & BBQ */}
-      <section aria-labelledby="bulk" className="relative isolate overflow-hidden bg-maroon py-20 text-[#f6e7cf] lg:py-24">
+      <section aria-labelledby="bulk" className="on-dark relative isolate overflow-hidden bg-maroon py-20 text-[#f6e7cf] lg:py-24">
         <Image src="/images/dishes/chicken-tikka-grill.webp" alt="" fill sizes="100vw" className="-z-10 object-cover opacity-25 mix-blend-luminosity" />
         <Container className="max-w-3xl text-center">
           <h2 id="bulk" className="font-display text-3xl font-semibold sm:text-4xl">

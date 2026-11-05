@@ -1,0 +1,20 @@
+/** Free-licence Pexels photos (pexels.com/license) used as serving suggestions until the kitchen supplies its own. */
+export const STOCK_PHOTOS: Record<string, { url: string; alt: string }> = {
+  "shahi-grilled-whole-chicken-rice-platter": { url: "https://images.pexels.com/photos/616353/pexels-photo-616353.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Roasted whole chicken (serving suggestion)" },
+  "shahi-chicken-korma": { url: "https://images.pexels.com/photos/10445627/pexels-photo-10445627.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Bowl of chicken curry (serving suggestion)" },
+  "shahi-chicken-degi": { url: "https://images.pexels.com/photos/12737808/pexels-photo-12737808.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Creamy meat curry with flatbread (serving suggestion)" },
+  "shahi-butter-chicken": { url: "https://images.pexels.com/photos/29685054/pexels-photo-29685054.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Butter chicken in a copper pan (serving suggestion)" },
+  "shahi-lamb-karahi": { url: "https://images.pexels.com/photos/9609846/pexels-photo-9609846.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Meat curry in a bowl (serving suggestion)" },
+  "shahi-seekh-kebab-karahi": { url: "https://images.pexels.com/photos/1105325/pexels-photo-1105325.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Grilled meat on a griddle (serving suggestion)" },
+  "shahi-daleem": { url: "https://images.pexels.com/photos/20408435/pexels-photo-20408435.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Slow-cooked dish in a pot with spices (serving suggestion)" },
+  "chicken-shawarma-with-sauce": { url: "https://images.pexels.com/photos/9980764/pexels-photo-9980764.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Chicken shawarma wrapped in paper (serving suggestion)" },
+  "shahi-crispy-chicken-roll": { url: "https://images.pexels.com/photos/5779423/pexels-photo-5779423.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Chicken roll held in hand (serving suggestion)" },
+  "loaded-sandwich-4": { url: "https://images.pexels.com/photos/7595073/pexels-photo-7595073.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Loaded chicken sandwich (serving suggestion)" },
+  "signature-jumbo-beef-burger": { url: "https://images.pexels.com/photos/2874989/pexels-photo-2874989.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Beef burger close-up (serving suggestion)" },
+  "shahi-jumbo-crunchy-chicken-burger": { url: "https://images.pexels.com/photos/11354334/pexels-photo-11354334.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Crunchy chicken burger (serving suggestion)" },
+  "shahi-crunchy-chicken-wrap": { url: "https://images.pexels.com/photos/38337105/pexels-photo-38337105.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Chicken wrap close-up (serving suggestion)" },
+  "chicken-loaded-creamy-club-sandwich": { url: "https://images.pexels.com/photos/19585047/pexels-photo-19585047.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Chicken sandwiches (serving suggestion)" },
+  "shahi-kheer": { url: "https://images.pexels.com/photos/116725/pexels-photo-116725.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Creamy rice pudding (serving suggestion)" },
+  "coconut-pops-5": { url: "https://images.pexels.com/photos/11700718/pexels-photo-11700718.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Coconut balls (serving suggestion)" },
+  "custard-cups-2": { url: "https://images.pexels.com/photos/19976297/pexels-photo-19976297.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Dessert cups (serving suggestion)" },
+};

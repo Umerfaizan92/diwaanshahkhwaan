@@ -54,7 +54,7 @@ export function Footer({ settings, hours }: { settings: BusinessSettings; hours:
         <div>
           <h2 className="font-display text-base text-gold">Pickup</h2>
           <p className="mt-4">{settings.pickupArea}</p>
-          <p className="mt-1 text-sm text-muted">Exact address is sent with your order confirmation.</p>
+          <p className="mt-1 text-sm text-muted">The full pickup address is sent with your order confirmation.</p>
           <h3 className="mt-5 text-sm font-semibold">Pickup hours</h3>
           <ul className="mt-1 space-y-0.5 text-sm text-muted">
             {formatHoursSummary(hours).map((l) => (
@@ -78,11 +78,16 @@ export function Footer({ settings, hours }: { settings: BusinessSettings; hours:
       </div>
       <div className="border-t border-line/70">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 pb-24 pt-6 text-sm text-muted sm:flex-row sm:pb-6 sm:items-center sm:justify-between sm:px-6 lg:px-8">
-          <p>
-            © {year} {settings.legalName ?? settings.businessName}
-            {settings.abn ? ` · ABN ${settings.abn}` : ""}
-          </p>
-          <p>Prices in AUD. Pickup only — we don&apos;t deliver.</p>
+          <div className="space-y-1">
+            <p>
+              Copyright © {year} {settings.legalName ?? settings.businessName}. All rights reserved.
+              {settings.abn ? ` ABN ${settings.abn}.` : ""}
+            </p>
+            <p>
+              Website designed and managed by <span className="font-semibold text-text">Faizan Sabir</span>.
+            </p>
+          </div>
+          <p>Prices in AUD. Pickup only, no delivery.</p>
         </div>
       </div>
     </footer>

@@ -56,6 +56,51 @@ describe("createReservation", () => {
     expect(items[0]).toMatchObject({ name: "Shahi Chicken Biryani", quantity: 2, unitPriceCents: 1200, lineTotalCents: 2400 });
   });
 
+  it("adds 10% GST on top when the business charges GST on the total", async () => {
+    await db.update(schema.businessSettings).set({ gstRegistered: true, gstMode: "ADD_ON" });
+    try {
+      const r = await createReservation(checkout(), { now: NOW, db });
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      expect(r.order).toMatchObject({ subtotalCents: 2400, gstCents: 240, totalCents: 2640 });
+    } finally {
+      await db.update(schema.businessSettings).set({ gstRegistered: false, gstMode: "INCLUSIVE" });
+    }
+  });
+
+  it("cash at pickup books the order straight away (no payment hold) and still respects capacity", async () => {
+    const r = await createReservation(checkout({ paymentMethod: "CASH" }), { now: NOW, db });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.order).toMatchObject({ status: "NEW", paymentMethod: "CASH", holdExpiresAt: null });
+    const { recordCashPayment } = await import("@/lib/server/orders");
+    expect((await recordCashPayment(r.order.id, "owner@test", db)).ok).toBe(true);
+    expect((await recordCashPayment(r.order.id, "owner@test", db)).ok).toBe(true); // idempotent
+    const pays = await db.select().from(schema.payments).where(eq(schema.payments.orderId, r.order.id));
+    expect(pays).toHaveLength(1);
+    expect(pays[0]).toMatchObject({ provider: "cash", status: "SUCCEEDED", amountCents: r.order.totalCents });
+    await db.update(schema.businessSettings).set({ acceptCash: false });
+    try {
+      const off = await createReservation(checkout({ paymentMethod: "CASH" }), { now: NOW, db });
+      expect(off.ok).toBe(false);
+    } finally {
+      await db.update(schema.businessSettings).set({ acceptCash: true });
+    }
+  });
+
+  it("ranks dishes by real orders and badges the most loved automatically", async () => {
+    const { getPublicMenu } = await import("@/lib/server/menu");
+    const before = (await getPublicMenu()).flatMap((c) => c.dishes).find((d) => d.id === biryaniId)!;
+    expect(before.isMostLoved).toBe(false);
+    const r = await createReservation(checkout({ paymentMethod: "CASH", lines: [{ menuItemId: biryaniId, quantity: 3, choiceIds: [mediumId] }] }), { now: NOW, db });
+    expect(r.ok).toBe(true);
+    // Unpaid card orders don't count
+    await createReservation(checkout({ pickupTime: "18:30", lines: [{ menuItemId: biryaniId, quantity: 5, choiceIds: [mediumId] }] }), { now: NOW, db });
+    const after = (await getPublicMenu()).flatMap((c) => c.dishes).find((d) => d.id === biryaniId)!;
+    expect(after.orderedCount).toBe(3);
+    expect(after.isMostLoved).toBe(true);
+  });
+
   it("is idempotent: the same checkout submitted twice creates one order", async () => {
     const input = checkout();
     const [a, b] = await Promise.all([createReservation(input, { now: NOW, db }), createReservation(input, { now: NOW, db })]);

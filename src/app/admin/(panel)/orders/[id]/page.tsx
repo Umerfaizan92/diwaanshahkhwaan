@@ -11,7 +11,8 @@ import { formatDateLong } from "@/lib/domain/time";
 import { formatTime12 } from "@/lib/domain/hours";
 import { toTelHref } from "@/lib/config/business";
 import { AdminHeader, Badge, Panel } from "@/components/admin/ui";
-import { OrderControls, RefundForm, ResendButtons } from "@/components/admin/widgets";
+import { CashReceivedButton, OrderControls, RefundForm, ResendButtons } from "@/components/admin/widgets";
+import { OrderTotals } from "@/components/shop/OrderTotals";
 import { getDb, schema } from "@/lib/db";
 import { desc, eq } from "drizzle-orm";
 
@@ -34,7 +35,8 @@ export default async function OrderDetailPage({ params }: PageProps<"/admin/orde
         title={`${o.reference} · ${o.customerName}`}
         intro={
           <>
-            <Badge tone={o.status === "CANCELLED" || o.status === "REFUNDED" ? "danger" : o.status === "NEW" ? "maroon" : "gold"}>{STATUS_LABEL[o.status]}</Badge> Pickup {formatDateLong(o.pickupDate)} at {formatTime12(o.pickupTime)}
+            <Badge tone={o.status === "CANCELLED" || o.status === "REFUNDED" ? "danger" : o.status === "NEW" ? "maroon" : "gold"}>{STATUS_LABEL[o.status]}</Badge>{" "}
+            {o.paymentMethod === "CASH" ? <Badge tone={o.paidAt ? "gold" : "warning"}>{o.paidAt ? "Cash received" : "Cash at pickup: not yet paid"}</Badge> : <Badge tone="gold">Card</Badge>} Pickup {formatDateLong(o.pickupDate)} at {formatTime12(o.pickupTime)}
           </>
         }
         actions={
@@ -57,10 +59,7 @@ export default async function OrderDetailPage({ params }: PageProps<"/admin/orde
                 </li>
               ))}
             </ul>
-            <div className="mt-3 flex justify-between border-t border-line pt-3 font-semibold">
-              <span>Total{o.gstCents ? ` (incl. GST ${formatCents(o.gstCents)})` : ""}</span>
-              <span className="tabular-nums">{formatCents(o.totalCents)}</span>
-            </div>
+            <OrderTotals className="mt-3 border-t border-line pt-3" size="md" subtotalCents={o.subtotalCents} gstCents={o.gstCents} totalCents={o.totalCents} />
             {o.notes ? <p className="mt-4 rounded-xl border border-warning/40 bg-warning/10 p-3 text-sm">Customer note: {o.notes}</p> : null}
           </Panel>
           <Panel title="Customer">
@@ -95,6 +94,11 @@ export default async function OrderDetailPage({ params }: PageProps<"/admin/orde
         </div>
         <div className="space-y-6">
           <Panel title="Actions">
+            {o.paymentMethod === "CASH" && !o.paidAt && !["CANCELLED", "REFUNDED", "EXPIRED"].includes(o.status) && can(user.role, "orders:update") ? (
+              <div className="mb-4">
+                <CashReceivedButton orderId={o.id} totalLabel={formatCents(o.totalCents)} />
+              </div>
+            ) : null}
             <OrderControls
               orderId={o.id}
               status={o.status}

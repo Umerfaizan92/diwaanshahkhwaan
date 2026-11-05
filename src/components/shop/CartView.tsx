@@ -127,7 +127,18 @@ export function CartView({ acceptingOrders }: { acceptingOrders: boolean }) {
             <dt className="text-muted">Items</dt>
             <dd className="tabular-nums">{quote ? quote.itemCount : "…"}</dd>
           </div>
-          {quote && quote.gstCents > 0 ? (
+          {quote && quote.totalCents > quote.subtotalCents ? (
+            <>
+              <div className="flex justify-between">
+                <dt className="text-muted">Subtotal</dt>
+                <dd className="tabular-nums">{formatCents(quote.subtotalCents)}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-muted">GST (10%)</dt>
+                <dd className="tabular-nums">{formatCents(quote.gstCents)}</dd>
+              </div>
+            </>
+          ) : quote && quote.gstCents > 0 ? (
             <div className="flex justify-between text-sm">
               <dt className="text-muted">Includes GST</dt>
               <dd className="tabular-nums">{formatCents(quote.gstCents)}</dd>

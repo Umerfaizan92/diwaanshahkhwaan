@@ -16,7 +16,12 @@ export default async function CustomersPage({ searchParams }: PageProps<"/admin/
   const list = await customerList(q);
   return (
     <>
-      <AdminHeader title="Customers" intro="Everyone who has placed a paid order." />
+      <AdminHeader title="Customers" intro="Built automatically from every order: how many times each customer has ordered and how much they've spent." />
+      <div className="mb-4 flex flex-wrap gap-3 text-sm">
+        <Badge tone="gold">{list.length} customers</Badge>
+        <Badge tone="success">{list.filter((c) => c.orders > 1).length} repeat customers</Badge>
+        <Badge tone="neutral">{list.reduce((n, c) => n + c.orders, 0)} orders</Badge>
+      </div>
       <form action="/admin/customers" className="mb-4 flex flex-wrap gap-2">
         <input name="q" defaultValue={q} placeholder="Search name, email or phone" aria-label="Search customers" className="h-10 w-full rounded-lg sm:w-72 border border-line bg-sunken px-3" />
         <button className={buttonClass("ghost", "md")}>Search</button>
@@ -40,7 +45,7 @@ export default async function CustomersPage({ searchParams }: PageProps<"/admin/
                     <Link href={`/admin/customers/${encodeURIComponent(c.email)}`} className="font-semibold hover:text-gold">
                       {c.name}
                     </Link>{" "}
-                    {c.hasAccount ? <Badge tone="gold">Account</Badge> : null}
+                    {c.hasAccount ? <Badge tone="gold">Account</Badge> : null} {c.orders >= 3 ? <Badge tone="success">Regular</Badge> : c.orders === 2 ? <Badge tone="neutral">Returning</Badge> : null}
                     <span className="block text-xs text-muted">{c.email}</span>
                   </td>
                   <td className="py-2">{c.phone}</td>

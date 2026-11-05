@@ -14,7 +14,7 @@ const csp = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
+  "img-src 'self' data: blob: https://images.pexels.com",
   "font-src 'self'",
   "connect-src 'self'",
   "frame-ancestors 'none'",
@@ -28,7 +28,9 @@ if (process.env.NODE_ENV === "production" && process.env.DISABLE_CSP !== "true")
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   serverExternalPackages: ["pg", "sharp"],
-  images: { formats: ["image/avif", "image/webp"], minimumCacheTTL: 2678400 },
+  // Images are pre-sized WebP files, so on-the-fly optimisation is off: it ran the free
+  // 512MB instance out of memory (sharp/AVIF on 0.1 CPU) and caused 502s.
+  images: { unoptimized: true, remotePatterns: [{ protocol: "https", hostname: "images.pexels.com" }] },
   experimental: { serverActions: { bodySizeLimit: "8mb" } },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
