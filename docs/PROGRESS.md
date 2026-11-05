@@ -96,6 +96,7 @@ Status key: ✅ done and verified · 🟡 in progress · ⬜ not started
 
 ## Unresolved issues / next steps
 
-- Deployment to Render staging needs: (1) the Render connector connected to Claude or a Render login, and (2) a new
-  empty GitHub repo (`diwaanshahkhwaan`) with working GitHub access from this workspace.
+- Staging is live at https://diwaanshahkhwaan-soh8.onrender.com (free Render plan, Singapore, test-mode payments,
+  hidden from search engines). Code: https://github.com/Umerfaizan92/diwaanshahkhwaan (auto-deploys on push to main).
+- To enable the dashboard sign-in, set SEED_OWNER_EMAIL and SEED_OWNER_PASSWORD (12+ chars) on the Render service.
 - Owner items: `OWNER_VERIFICATION.md`. Regulatory items: `COMPLIANCE.md`. Go-live blockers: `READINESS_REPORT.md`.
