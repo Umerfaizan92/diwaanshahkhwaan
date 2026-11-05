@@ -365,6 +365,22 @@ export const paymentEvents = pgTable("payment_events", {
   processedAt: timestamp("processed_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+/**
+ * Sessions of the built-in DEMO payment provider (staging only). This plays the role of an
+ * external provider's records so the app's own payment state is never its source of truth.
+ */
+export const demoPaymentSessions = pgTable("demo_payment_sessions", {
+  id: text("id").primaryKey(),
+  orderReference: text("order_reference").notNull(),
+  amountCents: integer("amount_cents").notNull(),
+  currency: text("currency").notNull().default("aud"),
+  status: text("status", { enum: ["open", "paid", "failed", "cancelled", "expired"] }).notNull().default("open"),
+  paymentId: text("payment_id"),
+  refundedCents: integer("refunded_cents").notNull().default(0),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  createdAt: createdAt(),
+});
+
 /* ---------------- Notifications ---------------- */
 
 export const notificationJobs = pgTable(

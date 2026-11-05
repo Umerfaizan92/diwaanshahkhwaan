@@ -146,6 +146,12 @@ export function Header() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link href="/account" className="flex items-center justify-between border-b border-line/60 py-4 font-display text-xl">
+                  My orders
+                  <span aria-hidden className="text-gold">›</span>
+                </Link>
+              </li>
             </ul>
             <Link href="/menu" className={buttonClass("gold", "lg", "mt-8 w-full")}>
               Order now

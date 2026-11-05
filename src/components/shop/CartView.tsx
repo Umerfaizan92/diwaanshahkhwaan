@@ -61,7 +61,7 @@ export function CartView({ acceptingOrders }: { acceptingOrders: boolean }) {
 
   return (
     <div className="grid gap-10 lg:grid-cols-[1fr_22rem] lg:gap-14">
-      <section aria-labelledby="items-h">
+      <section aria-labelledby="items-h" className="min-w-0">
         <h2 id="items-h" className="sr-only">
           Items
         </h2>

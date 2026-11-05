@@ -8,7 +8,7 @@ Status key: ✅ done and verified · 🟡 in progress · ⬜ not started
 | 1 | Cinematic public website | ✅ | build; 14 routes return 200; no horizontal overflow at 375/768/1024/1440; axe WCAG 2.2 AA = 0 violations in both themes; mobile nav, contact form and theme toggle tested in a browser |
 | 2 | Database menu, dish pages, options, cart, server pricing | ✅ | 22 unit/integration tests; browser test: add to cart, tampered client price ignored, live sold-out and price edits, portion group created in admin and priced on site |
 | 3 | Scheduling engine | ✅ | 15 boundary unit tests (notice, cut-off, DST, capacity, limits); concurrency integration tests (12 racing checkouts for 4 places → exactly 4; dish daily cap never oversold); owner schedule UI tested in a browser |
-| 4 | Checkout and payments (test mode) | ⬜ | |
+| 4 | Checkout and payments (test mode) | ✅ | 15 payment integration tests (success, duplicates, late webhook, reconcile, failure plus retry, cancel, expiry, late payment, amount mismatch, refunds incl. concurrency and provider failure, Stripe and demo signature checks, live-key guard); browser run: decline → retry → paid → receipt, cancel at payment page, account sign-up |
 | 5 | Owner dashboard and RBAC | ⬜ | |
 | 6 | Notifications | ⬜ | |
 | 7 | SEO, accessibility, legal, compliance | ⬜ | |
@@ -50,6 +50,18 @@ Status key: ✅ done and verified · 🟡 in progress · ⬜ not started
   are idempotent. Unpaid holds stop counting the moment they expire, and a sweeper marks them EXPIRED. `/api/slots`
   feeds the customer pickup picker. Owner "Pickup & capacity" page: rules, weekly hours, closed dates and a
   this-week capacity view.
+
+- Phase 4: checkout (guest or signed-in) with pickup picker, server-priced review and terms consent. Payment provider
+  abstraction: Stripe Checkout (hosted, AUD, test keys only; live keys refused unless `ALLOW_LIVE_PAYMENTS=true`)
+  and a built-in demo provider for staging, which uses the same signed-webhook path. Orders are confirmed only by a
+  verified webhook or a server-to-server session lookup (reconciliation), never by the redirect. Event ids are
+  stored transactionally for idempotency, with conditional status updates. Failed payments can be retried while the
+  hold lasts; customers can cancel unpaid orders; expired sessions expire orders; the sweeper reconciles before
+  expiring; late payments are accepted and flagged when the slot is now full; amount mismatches are flagged. Refunds:
+  partial or full, row-locked against over-refunding, idempotent, recorded on provider failure. Order tracking page
+  (secret link), printable receipt (a tax invoice only when GST-registered with an ABN), optional customer accounts
+  with order history. Fixed during testing: a lock-order deadlock between refunds and reservations, and a mobile
+  overflow on checkout.
 
 ## Unresolved issues / next steps
 

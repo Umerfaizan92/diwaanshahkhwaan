@@ -15,6 +15,13 @@
       "when": 1793887905091,
       "tag": "0001_order_attention",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793888212024,
+      "tag": "0002_demo_payments",
+      "breakpoints": true
     }
   ]
 }

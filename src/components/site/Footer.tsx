@@ -5,6 +5,7 @@ import type { BusinessSettings, OpeningHours } from "@/lib/db/schema";
 import { formatHoursSummary } from "@/lib/domain/hours";
 
 const LEGAL = [
+  { href: "/account", label: "My orders" },
   { href: "/faq", label: "FAQs" },
   { href: "/allergens", label: "Allergen information" },
   { href: "/refunds", label: "Refunds & cancellations" },
@@ -76,7 +77,7 @@ export function Footer({ settings, hours }: { settings: BusinessSettings; hours:
         </nav>
       </div>
       <div className="border-t border-line/70">
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 pb-24 pt-6 text-sm text-muted sm:flex-row sm:pb-6 sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <p>
             © {year} {settings.legalName ?? settings.businessName}
             {settings.abn ? ` · ABN ${settings.abn}` : ""}
