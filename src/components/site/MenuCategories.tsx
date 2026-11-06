@@ -18,8 +18,12 @@ export function MenuCategories({ categories }: { categories: CategoryTile[] }) {
             className={`group relative flex ${wide ? "aspect-[16/9] md:aspect-[4/5]" : "aspect-[4/5]"} h-full flex-col justify-end overflow-hidden rounded-2xl border border-gold/25 bg-sunken focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus`}
           >
             {c.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={c.image} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={c.image} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-70 blur-xl" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={c.image} alt="" loading="lazy" decoding="async" className="absolute inset-x-0 top-0 h-[68%] w-full object-contain transition-transform duration-700 ease-out group-hover:scale-105" />
+              </>
             ) : (
               <HandiIcon className="absolute left-1/2 top-[30%] w-1/3 -translate-x-1/2 -translate-y-1/2 text-gold/50" />
             )}

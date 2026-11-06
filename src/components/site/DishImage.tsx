@@ -46,7 +46,9 @@ export function DishImage({
   if (src) {
     return (
       <div className={`relative overflow-hidden bg-sunken ${shapeClass} ${className}`}>
-        <Image src={src} alt={alt} fill sizes={sizes} priority={priority} className="object-cover" />
+        {/* Whole photo always visible: a soft blurred copy fills any spare space behind it */}
+        <Image src={src} alt="" aria-hidden fill sizes="64px" className="scale-110 object-cover opacity-60 blur-xl" />
+        <Image src={src} alt={alt} fill sizes={sizes} priority={priority} className="object-contain" />
       </div>
     );
   }

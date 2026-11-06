@@ -61,7 +61,7 @@ export default async function DishPage({ params }: PageProps<"/menu/[slug]">) {
             sizes="(min-width:1024px) 45vw, 92vw"
             priority
             showName
-            className={`mx-auto aspect-[4/5] w-full max-w-lg ${dish.isAvailable ? "" : "opacity-60 grayscale"}`}
+            className={`mx-auto aspect-[4/3] w-full max-w-xl ${dish.isAvailable ? "" : "opacity-60 grayscale"}`}
           />
         </div>
 

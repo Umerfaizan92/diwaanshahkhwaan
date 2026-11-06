@@ -393,8 +393,8 @@ export function MenuItemForm({
       <aside className="space-y-5 xl:sticky xl:top-6 xl:self-start">
         <div className="rounded-2xl border border-line bg-raised p-5">
           <p className="mb-3 font-semibold">Photo</p>
-          <div className="arch relative mx-auto aspect-[4/5] w-48 overflow-hidden bg-sunken">
-            {preview ? <Image src={preview} alt="" fill sizes="192px" className="object-cover" /> : <span className="absolute inset-0 grid place-items-center text-sm text-muted">No photo</span>}
+          <div className="arch relative mx-auto aspect-[4/3] w-56 overflow-hidden bg-sunken">
+            {preview ? <Image src={preview} alt="" fill sizes="224px" className="object-contain" /> : <span className="absolute inset-0 grid place-items-center text-sm text-muted">No photo</span>}
           </div>
           <Field id="image" label="Choose photo">
             <Select id="image" value={f.imagePath ?? ""} onChange={(e) => set("imagePath", e.target.value || null)}>
