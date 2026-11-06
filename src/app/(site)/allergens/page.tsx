@@ -4,7 +4,7 @@ import { Container, PageHeader } from "@/components/site/PageHeader";
 import { Prose } from "@/components/site/Prose";
 import { getPublicMenu } from "@/lib/server/menu";
 import { getSettings } from "@/lib/server/settings";
-import { toTelHref } from "@/lib/config/business";
+import { toSmsHref, toTelHref } from "@/lib/config/business";
 import { DECLARABLE_ALLERGENS } from "@/lib/domain/allergens";
 
 export const metadata: Metadata = {
@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 
 export default async function AllergensPage() {
   const [menu, s] = await Promise.all([getPublicMenu(), getSettings()]);
+  const phone = s.contacts[0]?.phone ?? null;
   return (
     <>
       <PageHeader title="Allergen information" intro="If you have a food allergy or intolerance, please talk to us before you order." />
@@ -37,8 +38,8 @@ export default async function AllergensPage() {
             Allergens we declare, in line with the Australia New Zealand Food Standards Code: {DECLARABLE_ALLERGENS.join("; ")}.
           </p>
           <p>
-            Dishes marked <strong>&ldquo;being confirmed&rdquo;</strong> below don&apos;t have their allergen details finalised yet. Don&apos;t
-            assume they&apos;re free of any allergen — ask us first.
+            For dishes marked <strong>&ldquo;Call or message to verify&rdquo;</strong>, please call or text us before ordering and
+            we&apos;ll confirm the ingredients for you. Don&apos;t assume a dish is free of any allergen.
           </p>
         </Prose>
 
@@ -52,8 +53,8 @@ export default async function AllergensPage() {
               <li className="inline-flex items-center gap-1.5 rounded-full border border-success/40 bg-success/10 px-2.5 py-1 font-semibold text-success">
                 <span aria-hidden>✓</span> Confirmed
               </li>
-              <li className="inline-flex items-center gap-1.5 rounded-full border border-warning/50 bg-warning/10 px-2.5 py-1 font-semibold text-warning">
-                <span aria-hidden>!</span> Being confirmed
+              <li className="inline-flex items-center gap-1.5 rounded-full border border-gold/50 bg-gold/10 px-2.5 py-1 font-semibold text-gold">
+                <span aria-hidden>☎</span> Call or message to verify
               </li>
             </ul>
           </div>
@@ -73,7 +74,7 @@ export default async function AllergensPage() {
                       {d.allergensConfirmed ? (
                         <span className="shrink-0 rounded-full bg-success/15 px-2 py-0.5 text-xs font-semibold text-success">Confirmed</span>
                       ) : (
-                        <span className="shrink-0 rounded-full bg-warning/15 px-2 py-0.5 text-xs font-semibold text-warning">Being confirmed</span>
+                        <span className="shrink-0 rounded-full bg-gold/15 px-2 py-0.5 text-xs font-semibold text-gold">Verify with us</span>
                       )}
                     </div>
                     {d.allergensConfirmed ? (
@@ -98,7 +99,21 @@ export default async function AllergensPage() {
                         </div>
                       </dl>
                     ) : (
-                      <p className="text-sm text-muted">Allergen details are still being confirmed. Please ask us before ordering.</p>
+                      <div className="space-y-3">
+                        <p className="text-sm text-muted">Have an allergy? Call or message us to verify the ingredients before you order.</p>
+                        {phone ? (
+                          <div className="grid grid-cols-2 gap-2">
+                            <a href={toTelHref(phone)} className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-gold px-3 text-sm font-semibold text-gold-ink" aria-label={`Call ${phone} about ${d.name}`}>
+                              <svg viewBox="0 0 20 20" className="size-4" aria-hidden><path d="M5.5 2.5h2l1.5 4-2 1.2a10 10 0 0 0 5.3 5.3l1.2-2 4 1.5v2a2 2 0 0 1-2 2A14.5 14.5 0 0 1 3.5 4.5a2 2 0 0 1 2-2Z" fill="currentColor" /></svg>
+                              Call
+                            </a>
+                            <a href={toSmsHref(phone, `Hi, I have an allergy question about ${d.name}.`)} className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full border border-gold/60 px-3 text-sm font-semibold text-text hover:bg-gold/10" aria-label={`Message ${phone} about ${d.name}`}>
+                              <svg viewBox="0 0 20 20" className="size-4" aria-hidden><path d="M3 4.5A1.5 1.5 0 0 1 4.5 3h11A1.5 1.5 0 0 1 17 4.5v8a1.5 1.5 0 0 1-1.5 1.5H8l-4 3v-3h0.5A1.5 1.5 0 0 1 3 12.5v-8Z" fill="currentColor" /></svg>
+                              Message
+                            </a>
+                          </div>
+                        ) : null}
+                      </div>
                     )}
                   </li>
                 ))}

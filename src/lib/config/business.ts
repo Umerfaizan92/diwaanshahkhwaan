@@ -21,6 +21,12 @@ export const BUSINESS_DEFAULTS = {
 } as const;
 
 /** "0452 401 786" -> "tel:+61452401786" */
+/** sms: link that opens the phone's messaging app, optionally with a pre-filled message */
+export function toSmsHref(phone: string, body?: string): string {
+  const tel = toTelHref(phone).slice(4);
+  return `sms:${tel}${body ? `?&body=${encodeURIComponent(body)}` : ""}`;
+}
+
 export function toTelHref(phone: string): string {
   const digits = phone.replace(/\D/g, "");
   if (digits.startsWith("61")) return `tel:+${digits}`;

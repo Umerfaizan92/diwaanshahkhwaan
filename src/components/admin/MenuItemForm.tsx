@@ -252,7 +252,7 @@ export function MenuItemForm({
             <input type="checkbox" className="mt-1 size-4 accent-[var(--gold)]" checked={f.allergensConfirmed} onChange={(e) => set("allergensConfirmed", e.target.checked)} />
             <span>
               <strong>I&apos;ve checked this dish&apos;s allergens against the recipe and suppliers&apos; labels.</strong> Until this is ticked, the website
-              tells customers the allergens are still being confirmed.
+              asks customers to call or message you to verify allergens.
             </span>
           </label>
         </fieldset>

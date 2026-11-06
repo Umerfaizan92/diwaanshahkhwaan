@@ -9,7 +9,7 @@ import { formatCentsShort } from "@/lib/domain/money";
 import { DAY_NAMES } from "@/lib/domain/hours";
 import { getDishBySlug } from "@/lib/server/menu";
 import { getSettings } from "@/lib/server/settings";
-import { toTelHref } from "@/lib/config/business";
+import { toSmsHref, toTelHref } from "@/lib/config/business";
 import { JsonLd } from "@/components/site/JsonLd";
 import { dishLd } from "@/lib/server/structured-data";
 
@@ -98,15 +98,21 @@ export default async function DishPage({ params }: PageProps<"/menu/[slug]">) {
                   </>
                 ) : (
                   <>
-                    Allergen details for this dish are still being confirmed. If you have an allergy, please{" "}
+                    Have an allergy? Please{" "}
                     {phone ? (
-                      <a href={toTelHref(phone)} className="text-gold underline">
-                        call {phone}
-                      </a>
+                      <>
+                        <a href={toTelHref(phone)} className="text-gold underline">
+                          call
+                        </a>{" "}
+                        or{" "}
+                        <a href={toSmsHref(phone, `Hi, I have an allergy question about ${dish.name}.`)} className="text-gold underline">
+                          message {phone}
+                        </a>
+                      </>
                     ) : (
-                      "call us"
+                      "call or message us"
                     )}{" "}
-                    before ordering.
+                    to verify the ingredients before ordering.
                   </>
                 )}{" "}
                 We cook in a shared home kitchen, so we can&apos;t guarantee any dish is free from traces of allergens.{" "}
