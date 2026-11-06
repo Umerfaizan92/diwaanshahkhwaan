@@ -393,7 +393,7 @@ export function MenuItemForm({
       <aside className="space-y-5 xl:sticky xl:top-6 xl:self-start">
         <div className="rounded-2xl border border-line bg-raised p-5">
           <p className="mb-3 font-semibold">Photo</p>
-          <div className="arch relative mx-auto aspect-[16/10] w-56 overflow-hidden bg-sunken">
+          <div className="arch relative mx-auto aspect-[5/4] w-56 overflow-hidden bg-sunken">
             {preview ? <Image src={preview} alt="" fill sizes="224px" className="object-cover" /> : <span className="absolute inset-0 grid place-items-center text-sm text-muted">No photo</span>}
           </div>
           <Field id="image" label="Choose photo">

@@ -106,7 +106,7 @@ export function Hero({ pickupArea, acceptingOrders, halal = false, dishes = [] }
           ) : null}
         </div>
         {/* Phones and tablets: the dish carousel sits above the arch when there's room */}
-        <div className="pop-up absolute left-1/2 top-[4.5rem] hidden w-[min(72vw,19rem)] -translate-x-1/2 [animation-delay:0.7s] [@media(min-height:800px)]:block sm:w-[22rem] lg:!hidden">
+        <div className="pop-up absolute left-1/2 top-[4.5rem] hidden w-[min(56vw,15rem)] -translate-x-1/2 [animation-delay:0.7s] [@media(min-height:800px)]:block sm:w-[18rem] lg:!hidden">
           <HeroDishRotator dishes={dishes} />
         </div>
         {halal ? (

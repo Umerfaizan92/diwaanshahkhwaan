@@ -103,7 +103,7 @@ export default async function HomePage() {
           alt="A royal family table set with chicken biryani, mutton curry, seekh kebabs, naan, raita and gulab jamun"
           loading="lazy"
           decoding="async"
-          className="block aspect-[16/10] w-full object-cover object-[45%_75%] sm:aspect-[16/9] lg:absolute lg:inset-0 lg:-z-10 lg:aspect-auto lg:h-full lg:object-[30%_center]"
+          className="block aspect-[5/4] w-full object-cover object-[45%_75%] sm:aspect-[16/9] lg:absolute lg:inset-0 lg:-z-10 lg:aspect-auto lg:h-full lg:object-[30%_center]"
         />
         <div aria-hidden className="absolute inset-0 -z-10 hidden lg:block lg:bg-[linear-gradient(90deg,rgb(10_7_5/0.15)_0%,rgb(10_7_5/0.45)_45%,rgb(10_7_5/0.93)_70%)]" />
         <Container className="flex py-12 lg:min-h-[44rem] lg:items-center lg:justify-end lg:py-24">

@@ -48,7 +48,7 @@ export function DishCard({ dish, priority = false, sizes = "(min-width:1024px) 2
           name={dish.name}
           sizes={sizes}
           priority={priority}
-          className={`aspect-[16/10] w-full transition-transform duration-500 ease-out group-hover:scale-[1.015] ${dish.isAvailable ? "" : "opacity-60 grayscale"}`}
+          className={`aspect-[5/4] w-full transition-transform duration-500 ease-out group-hover:scale-[1.015] ${dish.isAvailable ? "" : "opacity-60 grayscale"}`}
         />
         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
           <DishTags dish={dish} />

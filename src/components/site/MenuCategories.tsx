@@ -18,7 +18,7 @@ export function MenuCategories({ categories }: { categories: CategoryTile[] }) {
             className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gold/25 bg-raised transition-colors hover:border-gold/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
             {/* Photo fills its own landscape frame edge to edge, text sits below it */}
-            <span className="relative block aspect-[16/10] overflow-hidden bg-sunken">
+            <span className="relative block aspect-[5/4] overflow-hidden bg-sunken">
               {c.image ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={c.image} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105" />

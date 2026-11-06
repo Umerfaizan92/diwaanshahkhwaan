@@ -10,10 +10,10 @@ export const metadata: Metadata = {
 };
 
 const GALLERY = [
-  { src: "/images/dishes/chicken-tikka-grill.webp", alt: "Rows of chicken tikka skewers on the grill", cls: "col-span-2 aspect-[16/10]" },
+  { src: "/images/dishes/chicken-tikka-grill.webp", alt: "Rows of chicken tikka skewers on the grill", cls: "col-span-2 aspect-[5/4]" },
   { src: "/images/dishes/biryani-tray-2.webp", alt: "Chicken biryani in foil trays", cls: "aspect-[3/4]" },
   { src: "/images/dishes/mixed-grill.webp", alt: "Malai and red tikka pieces grilling", cls: "aspect-[3/4]" },
-  { src: "/images/dishes/biryani-karahi-spread.webp", alt: "Biryani and karahi packed in takeaway containers", cls: "col-span-2 aspect-[16/10]" },
+  { src: "/images/dishes/biryani-karahi-spread.webp", alt: "Biryani and karahi packed in takeaway containers", cls: "col-span-2 aspect-[5/4]" },
 ];
 
 export default function AboutPage() {

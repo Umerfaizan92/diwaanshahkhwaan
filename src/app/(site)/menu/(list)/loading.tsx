@@ -6,7 +6,7 @@ export default function MenuLoading() {
       <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         {Array.from({ length: 8 }).map((_, i) => (
           <div key={i}>
-            <div className="skeleton arch aspect-[16/10] w-full" />
+            <div className="skeleton arch aspect-[5/4] w-full" />
             <div className="skeleton mt-4 h-5 w-3/4" />
             <div className="skeleton mt-2 h-4 w-1/2" />
           </div>
