@@ -1,6 +1,6 @@
 {
   "name": "diwaanshahkhwaan",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -15,7 +15,6 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "render:predeploy": "tsx scripts/migrate.ts && tsx scripts/seed.ts",
     "start:render": "tsx scripts/migrate.ts && tsx scripts/seed.ts && NODE_OPTIONS=--max-old-space-size=256 exec node node_modules/next/dist/bin/next start -p ${PORT:-10000}"
   },
   "dependencies": {
@@ -50,5 +49,6 @@
   },
   "engines": {
     "node": ">=22"
-  }
+  },
+  "description": "Diwaan Shah Khwaan (DSK) online ordering website and owner dashboard"
 }

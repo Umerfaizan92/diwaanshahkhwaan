@@ -1,4 +1,8 @@
-/** Free-licence Pexels photos (pexels.com/license) used as serving suggestions until the kitchen supplies its own. */
+/**
+ * Dish photo for each menu item (by slug). Most are the owner's own photos in /public/images/dishes/menu;
+ * any https://images.pexels.com entry is a free-licence stock photo (pexels.com/license) used until the owner
+ * supplies one. Photos uploaded in the dashboard always take priority over this list.
+ */
 export const STOCK_PHOTOS: Record<string, { url: string; alt: string }> = {
   "shahi-grilled-whole-chicken-rice-platter": { url: "/images/dishes/menu/shahi-grilled-whole-chicken-rice-platter.webp", alt: "Shahi Signature Grilled Whole Chicken & Rice Platter, royal serving" },
   "shahi-chicken-korma": { url: "/images/dishes/menu/shahi-chicken-korma.webp", alt: "Shahi Chicken Korma served in a royal brass bowl" },

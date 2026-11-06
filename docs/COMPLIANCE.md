@@ -75,7 +75,7 @@ temperature and cleaning records required by 3.2.2A.
 
 - [ ] Review the privacy policy template. Small businesses under $3 million turnover are generally exempt from the
       Privacy Act, but following the Australian Privacy Principles is good practice and expected by customers.
-- [ ] Limit who has staff accounts. Use the Kitchen role for helpers. Review the audit log periodically.
+- [ ] Only the owner can sign in to the dashboard. Keep the password private and review the audit log periodically.
 - [ ] Email and SMS providers may store data overseas. This is disclosed in the policy; confirm your providers.
 - [ ] Only send marketing to customers who opt in (no marketing is sent by default).
 

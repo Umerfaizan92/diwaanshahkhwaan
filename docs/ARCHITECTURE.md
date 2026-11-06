@@ -1,13 +1,12 @@
-# Diwaan Shah Khwaan — Architecture & Implementation Plan
+# Diwaan Shah Khwaan — Architecture
 
 **Brand:** DSK · Diwaan Shah Khwaan — "Taste the Royalty" · "Royal flavours served with love"
 **Business:** home-cooked Pakistani/Mughlai takeaway, advance orders, **pickup only** in the Langford WA 6147 area.
 
 ## 0. Repository status
 
-- **New project.** No existing repository was connected, so this is a fresh codebase.
-- It is **fully isolated** from the Super Pro AI / AI Office Manager repo and its Render services. It has its own
-  folder, git history, database and (when deployed) its own GitHub repo and Render services.
+- A standalone project with its own git history, database, GitHub repository and Render services. It shares nothing
+  with any other project.
 
 ## 1. Stack
 
@@ -15,17 +14,17 @@
 |---|---|---|
 | Framework | Next.js 16 (App Router, React 19, TypeScript `strict`) | Server components and server actions; route handlers for webhooks and cron |
 | Styling | Tailwind CSS 4 with CSS design tokens | Dark charcoal and gold by default; cream light mode via `data-theme` |
-| Motion | `motion` (Framer Motion) | All animation is disabled under `prefers-reduced-motion` |
+| Motion | CSS animations (hero, steam, seal) plus `motion` for small UI transitions (cart, pickup picker) | All animation is disabled under `prefers-reduced-motion` |
 | Fonts | Cinzel (display) and Figtree (text), self-hosted woff2 | No third-party font requests |
 | Database | PostgreSQL 16 | |
 | ORM | **Drizzle ORM** and drizzle-kit SQL migrations | See note below |
-| Auth | Server-side sessions (DB-backed, revocable) in httpOnly signed cookies (`jose` HS256); bcrypt (cost 12) | Separate staff and customer sessions; login rate-limiting |
-| Payments | Stripe Checkout (hosted, AUD, **test mode**), plus a built-in **demo** provider for staging | Card data never touches this app |
+| Auth | **Owner-only dashboard.** Server-side sessions (DB-backed, revocable) in httpOnly signed cookies (`jose` HS256); bcrypt (cost 12) | One-time owner setup and "forgot password" verified by 6-digit codes sent to the business mobile and email (HMAC-stored, 10-minute expiry, 5 attempts, single use); login and code requests rate-limited. Customers need no account: each order has a private tracking link |
+| Payments | **Card:** Stripe Checkout (hosted, AUD). **Cash at pickup:** booked immediately, owner marks cash received. A built-in **demo** provider for testing | Card data never touches this app; live keys need `ALLOW_LIVE_PAYMENTS=true` |
 | Email | Provider adapter: `console` (dev) or Resend (HTTP API) | Durable Postgres job queue |
 | SMS | Optional adapter: `none` or Twilio | Off by default |
-| Images | Seed photos in `/public`; owner uploads are re-encoded with `sharp` to WebP and stored in Postgres (`media`) | Strips metadata; survives Render's ephemeral disk |
+| Images | Dish photos in `/public/images/dishes/menu` (one per dish, 5:4), kitchen photos in `/public/images/dishes` (+ `sm/` phone sizes); owner uploads re-encoded with `sharp` to WebP and stored in Postgres (`media`) | No on-the-fly image optimisation (keeps the free 512 MB server stable) |
 | Tests | Vitest (unit and integration on a real Postgres test DB), Playwright (end-to-end, responsive, axe accessibility) | |
-| Hosting | Render Blueprint (`render.yaml`): a web service and Postgres | Pre-deploy runs migrations and an idempotent seed |
+| Hosting | Render Blueprint (`render.yaml`): a web service and Postgres in Singapore | Start command runs migrations and an idempotent seed, then the server |
 
 **ORM note:** Prisma was the preferred ORM. Its CLI needs to download native engine binaries from
 `binaries.prisma.sh`, and the build environment blocks that host, so migrations and client generation could not be
@@ -37,28 +36,35 @@ capabilities this app needs (transactions, row locks, typed queries). This keeps
 ```
 src/
   app/
-    (site)/        public pages: home, menu, menu/[slug], specials, weekly-menu, order-ahead, about,
-                   contact, faq, privacy, terms, refunds, allergens
-    (shop)/        cart, checkout, order/[ref] (tracking and receipt), account, pay/demo/[id]
-    admin/         owner dashboard (login plus protected sections)
-    api/           payments/webhook/[provider], cart/quote, slots, media/[id], cron/jobs, health
-  components/      ui/ (primitives), site/ (public sections), shop/, admin/
+    (site)/        public pages: home, menu, menu/[slug], specials, weekly-menu, order-ahead, about, contact,
+                   faq, allergens, privacy, terms, refunds, cart, checkout, order/[ref] (tracking + receipt),
+                   account (redirects to the owner sign-in)
+    admin/         owner dashboard: login (+ first-time setup, forgot password) and protected sections:
+                   orders, kitchen schedule, menu, categories, food photos, pickup & capacity, payments,
+                   customers, sales reports, messages, notifications, settings, owner login, audit log
+    pay/demo/[id]  simulated payment page (demo provider only)
+    api/           payments/webhook/[provider], cart/quote, slots, media/[id], cron/sweep, health
+  components/      ui/ (buttons, fields), site/ (hero, dish cards, carousel, halal seal…), shop/ (cart,
+                   checkout, payment badges), admin/ (dashboard forms and widgets)
   lib/
-    domain/        PURE business logic, unit-tested: money/GST, pricing, scheduling/slots, order state machine,
-                   permissions, validation schemas, timezone
-    server/        DB-touching services: menu, settings, orders (reservations), payments, refunds, auth,
-                   notifications queue and worker, audit, rate limiting, media
+    domain/        PURE business logic, unit-tested: money/GST, pricing, scheduling, order state machine,
+                   permissions, validation schemas, timezone, images
+    server/        DB-touching services: menu (incl. automatic "Most loved"), settings, orders (reservations,
+                   cash), payments, refunds, auth, owner access codes, notifications queue and worker,
+                   email templates, audit, rate limiting, reports, SEO structured data
     db/            Drizzle schema and client
-    config/        business defaults
-scripts/           migrate, seed
-drizzle/           SQL migrations
-tests/             unit/, integration/
-e2e/               Playwright specs
-docs/              this file, PROGRESS.md, COMPLIANCE.md, OWNER_VERIFICATION.md, READINESS_REPORT.md
+    config/        business defaults (name, phone, pickup area)
+    menu/          seed catalogue and dish photo map
+scripts/           migrate.ts, seed.ts
+drizzle/           SQL migrations (applied in order on every start; never edit or delete old ones)
+public/images/     brand emblem, kitchen photos, dish photos
+tests/             unit/, integration/ (Vitest on a real Postgres test DB)
+e2e/               Playwright: accessibility (axe), responsive, ordering, security
+docs/              ARCHITECTURE, DEPLOY, OWNER_GUIDE, COMPLIANCE, SEO_AND_BACKLINKS, CHANGELOG
 ```
 
-Customer pages, owner admin and server logic are separated. Admin pages call server actions, and **every** server
-action re-checks the session and role. `proxy.ts` only adds an optimistic redirect for signed-out users.
+Customer pages, the owner dashboard and server logic are separated. Dashboard pages call server actions, and
+**every** server action re-checks the owner session. `proxy.ts` only adds an optimistic redirect for signed-out users.
 
 ## 3. Key server-side rules
 
@@ -81,24 +87,19 @@ action re-checks the session and role. `proxy.ts` only adds an optimistic redire
    (`WHERE status = from`).
 7. **Notifications:** jobs have a unique `dedupe_key` (for example `order-confirmed:<id>:EMAIL`) and are claimed with
    `FOR UPDATE SKIP LOCKED`. Failures retry with exponential backoff and every attempt is logged.
-8. **Audit:** every staff mutation writes `audit_logs`.
+8. **Audit:** every dashboard change writes `audit_logs`.
+9. **Cash at pickup:** booked straight into `NEW` (no payment hold) and still counted against capacity; the owner
+   records the cash, which creates a `cash` payment so reports and receipts treat it like a card payment.
+10. **Popularity:** units ordered in paid and live cash orders over 120 days rank dishes; the top 4 (3+ ordered) get
+    "Most loved" and lead the homepage carousel. Nothing to maintain by hand.
 
 ## 4. GST
 
-Display prices are GST-inclusive. Each dish has a `gst_treatment` (`TAXABLE` or `GST_FREE`), and the business has a
-`gst_registered` flag (default **off**). While it is off, no GST is shown and receipts are plain receipts. When it is
-on and an ABN is set, receipts become "Tax invoice" and show GST as 1/11 of the taxable lines. **No tax assumptions
-are made; the owner must confirm the treatment with a registered tax agent or the ATO.**
+Set in Dashboard → Settings. Two modes:
 
-## 5. Milestones and dependencies
+- **Add 10% on top** (current): menu prices are before GST; checkout, receipts and Stripe show Subtotal + GST (10%)
+  = Total, with GST on taxable dishes only.
+- **Prices include GST:** GST is shown as 1/11 of taxable lines.
 
-| Phase | Scope | Depends on |
-|---|---|---|
-| 1 | Cinematic public site and design system | scaffold |
-| 2 | DB menu, dish pages, options, allergens, cart, server pricing | 1 |
-| 3 | Scheduling engine and pickup selector, owner schedule config | 2 |
-| 4 | Checkout, payments, webhooks, reconciliation, refunds | 3 |
-| 5 | Owner dashboard and RBAC | 2–4 |
-| 6 | Notifications (email and SMS), queue | 4–5 |
-| 7 | SEO, accessibility, legal pages, compliance | 1–6 |
-| 8 | Independent audit, fixes, readiness report, staging deploy | all |
+Each dish has a `gst_treatment` (`TAXABLE` or `GST_FREE`). Receipts become a "Tax invoice" only when GST-registered
+with an ABN. **Confirm GST registration and each dish's treatment with a registered tax agent or the ATO.**

@@ -1,55 +1,62 @@
 # Diwaan Shah Khwaan — online ordering
 
-Premium ordering website and kitchen dashboard for **DSK · Diwaan Shah Khwaan**, a home-cooked Pakistani takeaway
-offering advance orders for pickup in the Langford WA 6147 area.
+Premium ordering website and owner dashboard for **DSK · Diwaan Shah Khwaan** ("Taste the Royalty"), a home-cooked,
+**halal-certified** Pakistani takeaway taking advance orders for **pickup in Langford WA 6147**.
 
-This is a standalone project. It shares nothing with any other repository or Render service.
+- **Live:** https://www.diwaan.com.au (once the domain is connected) · staging https://diwaanshahkhwaan-soh8.onrender.com
+- **Website designed and managed by Faizan Sabir.**
 
 ## What's inside
 
-- **Customer site:** cinematic homepage, menu, dish pages with portions and options, allergens, weekly menu,
-  specials, cart, pickup scheduling, secure checkout, order tracking, receipts, optional accounts, and policy pages.
-- **Kitchen dashboard (`/admin`):** order board, kitchen schedule, menu and photos, pickup capacity, payments and
-  refunds, customers, sales reports and CSV export, notifications, settings, staff roles and the audit log.
-- **Server-side engines:** pricing, scheduling (Perth time) with transactional reservations, verified payments with
-  reconciliation, and a durable notification queue.
+**Customer website**
+- Cinematic homepage: kitchen-photo slideshow, fast dish carousel, Halal Certified seal, "Customer favourites"
+  (ranked automatically from real orders), "Explore the menu" tiles, the royal-feast kitchen story.
+- Menu (31 dishes, 7 categories) with photos, portions and options, spice levels, allergens with Call / Message
+  buttons, specials, weekly menu, FAQ, policies, contact form.
+- Cart, pickup date and time picker, checkout with **card (Stripe)** or **cash at pickup**, **10% GST** added at
+  checkout, order tracking link, printable receipt / tax invoice.
+- Confirmation email with the full receipt and pickup address; optional text messages.
 
-See `docs/ARCHITECTURE.md`, `docs/PROGRESS.md`, `docs/READINESS_REPORT.md`, `docs/COMPLIANCE.md` and
-`docs/OWNER_VERIFICATION.md`.
+**Owner dashboard (`/admin`) — owner only**
+- Orders board, kitchen schedule, cash received, refunds, payments.
+- Menu: change names, prices, photos (upload from the phone), availability, specials — live instantly.
+- Customers with automatic order counts and "Returning" / "Regular" badges; "Most loved" dish ranking.
+- Pickup hours and capacity, closed dates, GST mode, payment options, Halal certificate, notifications.
+- Secure owner setup and "Forgot password" by 6-digit code to the business mobile and email.
 
-## Run locally
+## Documents
+
+| File | What it covers |
+|---|---|
+| `docs/DEPLOY.md` | **Start here.** New GitHub account → Render → domain → Stripe, email and SMS keys |
+| `.env.example` | Every setting the server reads, with explanations |
+| `docs/OWNER_GUIDE.md` | Using the dashboard, and the launch checklist |
+| `docs/ARCHITECTURE.md` | How the code is organised and the key business rules |
+| `docs/COMPLIANCE.md` | Food business registration, allergens, GST, consumer law, privacy |
+| `docs/SEO_AND_BACKLINKS.md` | Google listing, Search Console, backlinks |
+| `docs/CHANGELOG.md` | What was built and changed, and how it was tested |
+
+## Run on a computer (developers)
 
 Requirements: Node 22+ and PostgreSQL 16.
 
 ```bash
-cp .env.example .env          # fill in DATABASE_URL, AUTH_SECRET, DEMO_PAYMENT_SECRET, SEED_OWNER_*
+cp .env.example .env          # fill in DATABASE_URL, AUTH_SECRET, DEMO_PAYMENT_SECRET
 npm ci
 npm run db:migrate && npm run db:seed
-npm run dev                   # http://localhost:3000 — staff sign-in at /admin
+npm run dev                   # http://localhost:3000 — owner sign-in at /admin/login
 ```
 
 ## Tests
 
 ```bash
 npm run typecheck && npm run lint
-npm run db:test:prepare && npm test        # unit + integration (uses TEST_DATABASE_URL)
+npm run db:test:prepare && npm test        # 100 unit + integration tests (uses TEST_DATABASE_URL)
 npm run build && npm start &               # then:
-npm run test:e2e                           # Playwright: accessibility, responsive, ordering, security
+npm run test:e2e                           # 22 Playwright tests: accessibility, phone sizes, ordering, security
 ```
 
-## Deploy (Render)
+## Deploy
 
-`render.yaml` creates a **new** web service and a **new** Postgres database in Singapore (the closest region to
-Perth). Set `SEED_OWNER_EMAIL` and `SEED_OWNER_PASSWORD` in the dashboard. The service runs migrations and an
-idempotent seed on start, and `/api/health` is the health check.
-
-Payments stay in **test mode**:
-
-- The default is the built-in demo provider, which never takes money.
-- To use Stripe, add Stripe **test** keys (`PAYMENT_PROVIDER=stripe`) and register the webhook
-  `https://<your-domain>/api/payments/webhook/stripe` for the events `checkout.session.completed`,
-  `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`, `checkout.session.expired`
-  and `refund.updated`.
-- Live keys are refused unless `ALLOW_LIVE_PAYMENTS=true` — **only with the owner's explicit approval**.
-
-Set `SITE_INDEXABLE=true` only on the final production domain.
+See **`docs/DEPLOY.md`**. In short: push this folder to a new GitHub repository, create a Render Blueprint from it
+(`render.yaml` creates the web service and Postgres database), then connect www.diwaan.com.au.

@@ -43,9 +43,36 @@ services:
         value: console
       - key: SMS_PROVIDER
         value: none
-      # Set in the dashboard to create the first owner login: SEED_OWNER_EMAIL, SEED_OWNER_PASSWORD (12+ chars).
-      # Optional, set later in the dashboard: APP_URL (custom domain), STRIPE_SECRET_KEY,
-      # STRIPE_WEBHOOK_SECRET, RESEND_API_KEY, EMAIL_FROM, TWILIO_* (see .env.example)
+      - key: DATABASE_POOL_MAX
+        value: "5"
+      # Values you enter in the Render dashboard (Render asks for them when the blueprint is applied).
+      # Leave any you don't have yet empty; see .env.example and docs/DEPLOY.md.
+      - key: APP_URL # e.g. https://www.diwaan.com.au
+        sync: false
+      - key: SEED_OWNER_EMAIL # optional: or use "Set up the owner account" on /admin/login
+        sync: false
+      - key: SEED_OWNER_PASSWORD
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_FROM
+        sync: false
+      - key: GOOGLE_SITE_VERIFICATION
+        sync: false
+      - key: BING_SITE_VERIFICATION
+        sync: false
+      - key: SOCIAL_LINKS
+        sync: false
 
 databases:
   - name: diwaanshahkhwaan-db
