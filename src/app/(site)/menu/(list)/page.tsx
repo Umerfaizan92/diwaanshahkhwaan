@@ -6,6 +6,7 @@ import { getSettings } from "@/lib/server/settings";
 import { JsonLd } from "@/components/site/JsonLd";
 import { menuLd } from "@/lib/server/structured-data";
 import { CategoryJump } from "@/components/site/CategoryJump";
+import { HalalBadge } from "@/components/site/HalalSeal";
 
 export const metadata: Metadata = {
   title: "Menu",
@@ -25,6 +26,11 @@ export default async function MenuPage() {
             Cooked fresh for each order. Choose your dishes, then pick a pickup time at checkout — we need at least{" "}
             {settings.minNoticeHours} hours&apos; notice.
             {settings.gstRegistered && settings.gstMode === "ADD_ON" ? " Prices shown are before GST; 10% GST is added at checkout." : null}
+            {settings.halalCertified ? (
+              <span className="mt-4 block">
+                <HalalBadge certifier={settings.halalCertifier} />
+              </span>
+            ) : null}
           </>
         }
       />

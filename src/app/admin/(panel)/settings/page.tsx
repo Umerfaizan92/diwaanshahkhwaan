@@ -29,6 +29,9 @@ export default async function SettingsPage() {
             gstMode: s.gstMode,
             acceptCash: s.acceptCash,
             acceptCard: s.acceptCard,
+            halalCertified: s.halalCertified,
+            halalCertifier: s.halalCertifier ?? "",
+            halalCertNumber: s.halalCertNumber ?? "",
           }}
         />
       </Panel>

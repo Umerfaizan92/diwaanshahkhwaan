@@ -9,6 +9,7 @@ import { buttonClass } from "@/components/ui/Button";
 import { getFavouriteDishes, getPublicMenu } from "@/lib/server/menu";
 import { DishCarousel } from "@/components/site/DishCarousel";
 import { cardImage } from "@/lib/domain/images";
+import { HalalSeal } from "@/components/site/HalalSeal";
 import { getOpeningHours, getSettings } from "@/lib/server/settings";
 import { toTelHref } from "@/lib/config/business";
 import { JsonLd } from "@/components/site/JsonLd";
@@ -28,7 +29,26 @@ export default async function HomePage() {
     <>
       <JsonLd data={restaurantLd(settings, hours)} />
       <JsonLd data={websiteLd(settings)} />
-      <Hero pickupArea={settings.pickupArea} acceptingOrders={settings.acceptingOrders} />
+      <Hero pickupArea={settings.pickupArea} acceptingOrders={settings.acceptingOrders} halal={settings.halalCertified} />
+
+      {settings.halalCertified ? (
+        <section aria-label="Halal certified" className="on-dark relative overflow-hidden border-y border-[#d9b45a]/40 bg-[linear-gradient(100deg,#2a0910,#5a1420_45%,#2a0910)] text-[#f7efe0]">
+          <div aria-hidden className="absolute inset-0 bg-[radial-gradient(60%_120%_at_50%_0%,rgb(226_189_94/0.18),transparent_70%)]" />
+          <Container className="relative flex flex-col items-center gap-5 py-10 text-center sm:flex-row sm:text-left">
+            <HalalSeal className="size-24 shrink-0 drop-shadow-[0_10px_24px_rgb(0_0_0/0.55)] sm:size-28" />
+            <div className="min-w-0">
+              <p className="font-display text-sm font-semibold tracking-[0.2em] text-[#f3d68a]">Our royal promise</p>
+              <h2 className="mt-1 font-display text-[clamp(1.4rem,4.5vw,2rem)] font-semibold text-[#fbf4e6]">
+                <span className="gold-leaf">100% Halal Certified</span> kitchen
+              </h2>
+              <p className="mt-2 max-w-2xl text-[#e9dcc4]">
+                Every dish is prepared with halal-certified meat and ingredients, cooked with care in our family kitchen.
+                {settings.halalCertifier ? ` Certified by ${settings.halalCertifier}${settings.halalCertNumber ? ` (certificate ${settings.halalCertNumber})` : ""}.` : ""}
+              </p>
+            </div>
+          </Container>
+        </section>
+      ) : null}
 
       {/* Signature dishes */}
       <section aria-labelledby="signature" className="py-20 lg:py-28">

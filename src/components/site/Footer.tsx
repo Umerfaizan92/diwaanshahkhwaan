@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HalalBadge } from "./HalalSeal";
 import Image from "next/image";
 import { toTelHref } from "@/lib/config/business";
 import type { BusinessSettings, OpeningHours } from "@/lib/db/schema";
@@ -28,6 +29,7 @@ export function Footer({ settings, hours }: { settings: BusinessSettings; hours:
             </span>
           </Link>
           <p className="mt-4 max-w-xs text-muted">{settings.tagline}. Home-cooked to order and collected fresh from our kitchen.</p>
+          {settings.halalCertified ? <HalalBadge certifier={settings.halalCertifier} className="mt-5" /> : null}
         </div>
 
         <div>

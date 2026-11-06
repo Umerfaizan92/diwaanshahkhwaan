@@ -160,6 +160,10 @@ export const businessSettings = pgTable("business_settings", {
   gstRegistered: boolean("gst_registered").notNull().default(false),
   /** INCLUSIVE: menu prices include GST. ADD_ON: 10% GST is added to the order total at checkout */
   gstMode: text("gst_mode", { enum: ["INCLUSIVE", "ADD_ON"] }).notNull().default("INCLUSIVE"),
+  /** Shows the Halal Certified seal across the site. Only switch on with a current certificate. */
+  halalCertified: boolean("halal_certified").notNull().default(false),
+  halalCertifier: text("halal_certifier"),
+  halalCertNumber: text("halal_cert_number"),
   acceptCash: boolean("accept_cash").notNull().default(true),
   acceptCard: boolean("accept_card").notNull().default(true),
   timezone: text("timezone").notNull().default("Australia/Perth"),

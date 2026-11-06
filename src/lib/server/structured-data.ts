@@ -40,7 +40,7 @@ export function restaurantLd(s: BusinessSettings, hours: OpeningHours[]) {
     areaServed: AREA_SERVED.map((name) => ({ "@type": "Place", name: `${name} WA` })),
     geo: { "@type": "GeoCoordinates", latitude: -32.04, longitude: 115.94 },
     ...(socialLinks().length ? { sameAs: socialLinks() } : {}),
-    keywords: "Pakistani food Perth, biryani Langford, karahi, BBQ platters, halal takeaway, home-cooked food Perth",
+    keywords: `${s.halalCertified ? "halal certified, " : ""}Pakistani food Perth, biryani Langford, karahi, BBQ platters, halal takeaway, home-cooked food Perth`,
     address: { "@type": "PostalAddress", addressLocality: locality.trim(), addressRegion: "WA", postalCode: (s.pickupArea.match(/\b\d{4}\b/) ?? [""])[0], addressCountry: "AU" },
     hasMenu: `${base()}/menu`,
     acceptsReservations: false,

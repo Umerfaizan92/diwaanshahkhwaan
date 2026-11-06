@@ -47,6 +47,9 @@ export const settingsSchema = z.object({
   gstMode: z.enum(["INCLUSIVE", "ADD_ON"]),
   acceptCash: z.boolean(),
   acceptCard: z.boolean(),
+  halalCertified: z.boolean(),
+  halalCertifier: z.string().trim().max(120).transform((v) => v || null),
+  halalCertNumber: z.string().trim().max(60).transform((v) => v || null),
 });
 
 export async function saveSettings(actor: StaffUser, raw: unknown, db: DB = getDb()): Promise<ActionResult> {

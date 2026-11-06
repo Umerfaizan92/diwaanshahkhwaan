@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DishImage } from "@/components/site/DishImage";
 import { DishTags, SpiceMeter } from "@/components/site/DishCard";
+import { HalalBadge } from "@/components/site/HalalSeal";
 import { Container } from "@/components/site/PageHeader";
 import { AddToCart } from "@/components/shop/AddToCart";
 import { formatCentsShort } from "@/lib/domain/money";
@@ -65,9 +66,10 @@ export default async function DishPage({ params }: PageProps<"/menu/[slug]">) {
         </div>
 
         <div>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5">
             <DishTags dish={dish} />
           </div>
+          {settings.halalCertified ? <HalalBadge certifier={settings.halalCertifier} className="mt-3" /> : null}
           <h1 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">{dish.name}</h1>
           <div className="mt-3 flex flex-wrap items-center gap-4">
             <span className="font-display text-2xl text-gold">{formatCentsShort(dish.priceCents)}</span>

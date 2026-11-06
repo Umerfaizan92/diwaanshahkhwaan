@@ -23,6 +23,9 @@ type S = {
   gstMode: "INCLUSIVE" | "ADD_ON";
   acceptCash: boolean;
   acceptCard: boolean;
+  halalCertified: boolean;
+  halalCertifier: string;
+  halalCertNumber: string;
 };
 
 export function BusinessSettingsForm({ initial }: { initial: S }) {
@@ -125,6 +128,22 @@ export function BusinessSettingsForm({ initial }: { initial: S }) {
           Cash at pickup
         </label>
         {errors.acceptCard ? <p className="text-sm text-danger">{errors.acceptCard}</p> : null}
+      </fieldset>
+      <fieldset className="space-y-3">
+        <legend className="mb-1 font-semibold">Halal certification</legend>
+        <label className="flex items-center gap-3">
+          <Switch checked={s.halalCertified} onChange={(v) => set("halalCertified", v)} label="Show Halal Certified seal" />
+          Show the &ldquo;Halal Certified&rdquo; seal on the website
+        </label>
+        <p className="text-sm text-muted">Only switch this on while you hold a current halal certificate. Turn it off straight away if the certificate lapses.</p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field id="hc" label="Certified by" hint="e.g. the certifying body's name">
+            <Input id="hc" value={s.halalCertifier} onChange={(e) => set("halalCertifier", e.target.value)} />
+          </Field>
+          <Field id="hn" label="Certificate number">
+            <Input id="hn" value={s.halalCertNumber} onChange={(e) => set("halalCertNumber", e.target.value)} />
+          </Field>
+        </div>
       </fieldset>
       <Button type="submit" disabled={pending}>
         {pending ? "Saving…" : "Save business settings"}

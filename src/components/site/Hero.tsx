@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { HeroParallax } from "./HeroParallax";
+import { HalalSeal } from "./HalalSeal";
 
 /** Real photos from the kitchen, cross-faded with a slow cinematic push-in. */
 const SLIDES = [
@@ -17,7 +18,7 @@ const SLIDE_SECONDS = 6;
  * Cinematic hero, rendered on the server with CSS-only motion. The hero always uses the dark
  * palette (`on-dark`) because it sits on photography, so text stays readable in light mode too.
  */
-export function Hero({ pickupArea, acceptingOrders }: { pickupArea: string; acceptingOrders: boolean }) {
+export function Hero({ pickupArea, acceptingOrders, halal = false }: { pickupArea: string; acceptingOrders: boolean; halal?: boolean }) {
   return (
     <section className="on-dark grain relative isolate flex min-h-[100svh] items-end overflow-hidden bg-[#0d0907] text-[#f7efe0] lg:items-center">
       <HeroParallax />
@@ -93,6 +94,20 @@ export function Hero({ pickupArea, acceptingOrders }: { pickupArea: string; acce
             </div>
           </div>
         </div>
+        {halal ? (
+          <>
+            {/* Desktop: large seal beside the arch */}
+            <div className="pop-up pointer-events-none absolute right-[6%] top-1/2 hidden -translate-y-1/2 [animation-delay:0.9s] lg:block">
+              <div className="halal-glow rounded-full">
+                <HalalSeal className="size-44 drop-shadow-[0_12px_30px_rgb(0_0_0/0.6)] xl:size-52" />
+              </div>
+            </div>
+            {/* Phones and tablets: seal tucked into the arch's top-right corner */}
+            <div className="pop-up absolute right-5 top-24 [animation-delay:0.9s] sm:right-8 lg:hidden">
+              <HalalSeal className="size-[4.5rem] drop-shadow-[0_8px_20px_rgb(0_0_0/0.6)] sm:size-24" />
+            </div>
+          </>
+        ) : null}
       </div>
     </section>
   );

@@ -74,6 +74,8 @@ export async function processNotificationJobs(opts: { now?: Date; limit?: number
   const db = opts.db ?? getDb();
   const now = opts.now ?? new Date();
   const lease = new Date(now.getTime() + 2 * 60_000);
+  // Postgres stores microseconds, JS dates milliseconds: a job queued in this same millisecond must still count as due
+  const dueBy = new Date(now.getTime() + 1);
   const claimed = await db
     .update(schema.notificationJobs)
     .set({ status: "SENDING", lockedUntil: lease, attempts: sql`${schema.notificationJobs.attempts} + 1` })
@@ -83,7 +85,7 @@ export async function processNotificationJobs(opts: { now?: Date; limit?: number
         db
           .select({ id: schema.notificationJobs.id })
           .from(schema.notificationJobs)
-          .where(or(and(eq(schema.notificationJobs.status, "PENDING"), lte(schema.notificationJobs.runAt, now)), and(eq(schema.notificationJobs.status, "SENDING"), lt(schema.notificationJobs.lockedUntil, now))))
+          .where(or(and(eq(schema.notificationJobs.status, "PENDING"), lte(schema.notificationJobs.runAt, dueBy)), and(eq(schema.notificationJobs.status, "SENDING"), lt(schema.notificationJobs.lockedUntil, now))))
           .orderBy(asc(schema.notificationJobs.runAt))
           .limit(opts.limit ?? 25)
           .for("update", { skipLocked: true }),

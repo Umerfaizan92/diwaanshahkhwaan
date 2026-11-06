@@ -142,6 +142,20 @@ a {
   text-shadow: none;
 }
 
+/* Soft pulsing glow behind the Halal Certified seal */
+.halal-glow {
+  animation: halal-glow 4s ease-in-out infinite;
+}
+@keyframes halal-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 40px 4px rgb(226 189 94 / 0.25);
+  }
+  50% {
+    box-shadow: 0 0 70px 14px rgb(226 189 94 / 0.45);
+  }
+}
+
 /* Steam rising from the logo's handi */
 .smoke {
   position: absolute;
@@ -376,6 +390,9 @@ a {
   }
   .smoke {
     display: none;
+  }
+  .halal-glow {
+    animation: none;
   }
   .hero-push,
   .arch-draw,
