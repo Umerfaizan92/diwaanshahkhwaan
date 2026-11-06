@@ -29,7 +29,15 @@ export default async function HomePage() {
     <>
       <JsonLd data={restaurantLd(settings, hours)} />
       <JsonLd data={websiteLd(settings)} />
-      <Hero pickupArea={settings.pickupArea} acceptingOrders={settings.acceptingOrders} halal={settings.halalCertified} />
+      <Hero
+        pickupArea={settings.pickupArea}
+        acceptingOrders={settings.acceptingOrders}
+        halal={settings.halalCertified}
+        dishes={menu
+          .flatMap((c) => c.dishes)
+          .filter((d) => d.isAvailable && d.image?.startsWith("/images/dishes/menu/"))
+          .map((d) => ({ slug: d.slug, name: d.name, src: d.image! }))}
+      />
 
       {settings.halalCertified ? (
         <section aria-label="Halal certified" className="on-dark relative overflow-hidden border-y border-[#d9b45a]/40 bg-[linear-gradient(100deg,#2a0910,#5a1420_45%,#2a0910)] text-[#f7efe0]">

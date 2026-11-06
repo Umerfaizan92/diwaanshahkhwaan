@@ -2,9 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { HeroParallax } from "./HeroParallax";
 import { HalalSeal } from "./HalalSeal";
+import { HeroDishRotator, type RotatorDish } from "./HeroDishRotator";
 
 /** Real photos from the kitchen, cross-faded with a slow cinematic push-in. */
 const SLIDES = [
+  { src: "/images/dishes/royal-menu-collage.webp", alt: "Royal collection of our dishes in brass bowls: korma, degi, butter chicken, karahi, biryani and more", pos: "50% 50%" },
   { src: "/images/dishes/bbq-platters-seekh.webp", alt: "Shahi BBQ platters with seekh kebab, chicken tikka, rice, salad and garlic dip", pos: "50% 40%" },
   { src: "/images/dishes/biryani-karahi-spread.webp", alt: "A spread of chicken biryani and karahi", pos: "50% 50%" },
   { src: "/images/dishes/mixed-grill.webp", alt: "Mixed grill with tikka and kebabs", pos: "50% 45%" },
@@ -12,19 +14,19 @@ const SLIDES = [
   { src: "/images/dishes/biryani-trays.webp", alt: "Trays of chicken biryani ready for pickup", pos: "50% 50%" },
   { src: "/images/dishes/bbq-platter-boti.webp", alt: "BBQ platter with chicken boti", pos: "50% 50%" },
 ];
-const SLIDE_SECONDS = 6;
+const SLIDE_SECONDS = 4;
 
 /**
  * Cinematic hero, rendered on the server with CSS-only motion. The hero always uses the dark
  * palette (`on-dark`) because it sits on photography, so text stays readable in light mode too.
  */
-export function Hero({ pickupArea, acceptingOrders, halal = false }: { pickupArea: string; acceptingOrders: boolean; halal?: boolean }) {
+export function Hero({ pickupArea, acceptingOrders, halal = false, dishes = [] }: { pickupArea: string; acceptingOrders: boolean; halal?: boolean; dishes?: RotatorDish[] }) {
   return (
     <section className="on-dark grain relative isolate flex min-h-[100svh] items-end overflow-hidden bg-[#0d0907] text-[#f7efe0] lg:items-center">
       <HeroParallax />
       <div className="parallax absolute inset-0 -z-10" style={{ ["--slides" as string]: SLIDES.length, ["--slide-s" as string]: `${SLIDE_SECONDS}s` }}>
         {SLIDES.map((s, i) => (
-          <div key={s.src} className="hero-slide absolute inset-0" style={{ animationDelay: `${i * SLIDE_SECONDS - 1.5}s` }} aria-hidden={i > 0 || undefined}>
+          <div key={s.src} className="hero-slide absolute inset-0" style={{ animationDelay: `${i * SLIDE_SECONDS - 0.4}s` }} aria-hidden={i > 0 || undefined}>
             {/* Plain responsive <img>: phones get the 720px file, larger screens the 1200–1600px one */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -94,19 +96,23 @@ export function Hero({ pickupArea, acceptingOrders, halal = false }: { pickupAre
             </div>
           </div>
         </div>
+        {/* Desktop: fast dish carousel beside the arch, with the Halal seal on its corner */}
+        <div className="pop-up absolute right-[5%] top-1/2 hidden w-[min(30vw,25rem)] -translate-y-1/2 [animation-delay:0.7s] lg:block">
+          <HeroDishRotator dishes={dishes} />
+          {halal ? (
+            <div className="halal-glow absolute -right-8 -top-12 rounded-full">
+              <HalalSeal className="size-32 drop-shadow-[0_12px_30px_rgb(0_0_0/0.6)] xl:size-36" />
+            </div>
+          ) : null}
+        </div>
+        {/* Phones and tablets: the dish carousel sits above the arch when there's room */}
+        <div className="pop-up absolute left-1/2 top-[4.5rem] hidden w-[min(72vw,19rem)] -translate-x-1/2 [animation-delay:0.7s] [@media(min-height:800px)]:block sm:w-[22rem] lg:!hidden">
+          <HeroDishRotator dishes={dishes} />
+        </div>
         {halal ? (
-          <>
-            {/* Desktop: large seal beside the arch */}
-            <div className="pop-up pointer-events-none absolute right-[6%] top-1/2 hidden -translate-y-1/2 [animation-delay:0.9s] lg:block">
-              <div className="halal-glow rounded-full">
-                <HalalSeal className="size-44 drop-shadow-[0_12px_30px_rgb(0_0_0/0.6)] xl:size-52" />
-              </div>
-            </div>
-            {/* Phones and tablets: seal tucked into the arch's top-right corner */}
-            <div className="pop-up absolute right-5 top-24 [animation-delay:0.9s] sm:right-8 lg:hidden">
-              <HalalSeal className="size-[4.5rem] drop-shadow-[0_8px_20px_rgb(0_0_0/0.6)] sm:size-24" />
-            </div>
-          </>
+          <div className="pop-up absolute right-3 top-[4.25rem] [animation-delay:0.9s] sm:right-6 lg:hidden">
+            <HalalSeal className="size-16 drop-shadow-[0_8px_20px_rgb(0_0_0/0.6)] sm:size-20" />
+          </div>
         ) : null}
       </div>
     </section>
