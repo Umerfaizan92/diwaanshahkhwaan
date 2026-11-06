@@ -18,7 +18,7 @@ export const STOCK_PHOTOS: Record<string, { url: string; alt: string }> = {
   "coconut-pops-5": { url: "https://images.pexels.com/photos/11700718/pexels-photo-11700718.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Coconut balls (serving suggestion)" },
   "custard-cups-2": { url: "https://images.pexels.com/photos/11397866/pexels-photo-11397866.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Creamy custard dessert cups (serving suggestion)" },
   "chicken-spaghetti": { url: "/images/dishes/menu/chicken-spaghetti.webp", alt: "Chicken Spaghetti served in a royal brass bowl" },
-  "chinese-vegetable-rice-manchurian": { url: "https://images.pexels.com/photos/31783383/pexels-photo-31783383.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Manchurian with fried rice (serving suggestion)" },
+  "chinese-vegetable-rice-manchurian": { url: "/images/dishes/menu/chinese-vegetable-rice-manchurian.webp", alt: "Vegetable fried rice with Manchurian in a royal brass bowl" },
   "shahi-achar-gosht": { url: "/images/dishes/menu/shahi-achar-gosht.webp", alt: "Shahi Achar Gosht served in a royal brass bowl" },
   "shahi-baingan": { url: "https://images.pexels.com/photos/29040190/pexels-photo-29040190.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Baked eggplant with tomatoes (serving suggestion)" },
   "shahi-dahi-baray": { url: "https://images.pexels.com/photos/9213253/pexels-photo-9213253.jpeg?auto=compress&cs=tinysrgb&w=900", alt: "Plate of dahi vada in yoghurt (serving suggestion)" },

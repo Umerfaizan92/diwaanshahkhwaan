@@ -6,7 +6,7 @@ import { HeroDishRotator, type RotatorDish } from "./HeroDishRotator";
 
 /** Real photos from the kitchen, cross-faded with a slow cinematic push-in. */
 const SLIDES = [
-  { src: "/images/dishes/royal-menu-collage.webp", alt: "Royal collection of our dishes in brass bowls: korma, degi, butter chicken, karahi, biryani and more", pos: "50% 50%" },
+  { src: "/images/dishes/royal-manchurian.webp", alt: "Vegetable fried rice and Manchurian on a royal gold platter", pos: "50% 50%" },
   { src: "/images/dishes/bbq-platters-seekh.webp", alt: "Shahi BBQ platters with seekh kebab, chicken tikka, rice, salad and garlic dip", pos: "50% 40%" },
   { src: "/images/dishes/biryani-karahi-spread.webp", alt: "A spread of chicken biryani and karahi", pos: "50% 50%" },
   { src: "/images/dishes/mixed-grill.webp", alt: "Mixed grill with tikka and kebabs", pos: "50% 45%" },

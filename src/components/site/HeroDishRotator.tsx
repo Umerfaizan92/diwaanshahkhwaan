@@ -29,7 +29,7 @@ export function HeroDishRotator({ dishes, className = "", interval = 2000 }: { d
       onBlur={() => setHold(false)}
       className={`group relative block overflow-hidden rounded-[1.6rem] border-2 border-[#d9b45a] bg-[#120c08] p-1.5 shadow-[0_30px_60px_-20px_rgb(0_0_0/0.8),0_0_40px_-8px_rgb(226_189_94/0.45)] ${className}`}
     >
-      <span className="relative block aspect-[301/249] overflow-hidden rounded-[1.25rem]">
+      <span className="relative block aspect-[2/1] overflow-hidden rounded-[1.25rem]">
         {dishes.map((x, n) => (
           // eslint-disable-next-line @next/next/no-img-element
           <img
