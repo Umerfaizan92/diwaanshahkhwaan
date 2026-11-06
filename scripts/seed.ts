@@ -30,6 +30,7 @@ export async function seed(url: string, opts: { quiet?: boolean } = {}) {
       gstMode: "ADD_ON",
       gstRegistered: true,
       ownerNotifyPhone: BUSINESS_DEFAULTS.contacts[0].phone,
+      halalCertified: true, // owner confirmed the kitchen is halal certified (6 Nov 2026)
     })
     .onConflictDoNothing();
 
