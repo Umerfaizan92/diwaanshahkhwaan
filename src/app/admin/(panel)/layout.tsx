@@ -7,7 +7,7 @@ import { can, type Permission } from "@/lib/domain/permissions";
 import { AdminNav, type NavItem } from "@/components/admin/AdminNav";
 import { staffLogout } from "../login/actions";
 
-export const metadata: Metadata = { title: { default: "Dashboard", template: "%s · DSK Kitchen" }, robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: { default: "Dashboard", template: "%s · DSK Owner" }, robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
 const NAV: (NavItem & { perm: Permission })[] = [

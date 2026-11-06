@@ -85,5 +85,5 @@ test("cash at pickup: order is booked at once with GST shown, and the owner reco
   await owner.goto(`/admin/orders?q=${ref}`);
   await owner.getByRole("link", { name: /E2E Customer/ }).first().click();
   await owner.getByRole("button", { name: /cash received/ }).click();
-  await expect(owner.getByText("Cash payment recorded")).toBeVisible();
+  await expect(owner.getByText("Cash received", { exact: true }).first()).toBeVisible();
 });

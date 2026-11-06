@@ -71,6 +71,13 @@
       "when": 1793913015532,
       "tag": "0009_owner_codes",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793950379860,
+      "tag": "0010_better_stock_photos",
+      "breakpoints": true
     }
   ]
 }
