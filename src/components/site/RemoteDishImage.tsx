@@ -18,8 +18,6 @@ export function RemoteDishImage({ src, alt, priority, className, fallback }: { s
   return (
     <div className={`relative overflow-hidden bg-sunken ${className}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt="" aria-hidden loading="lazy" referrerPolicy="no-referrer" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-xl" />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         ref={img}
         src={src}
@@ -28,7 +26,7 @@ export function RemoteDishImage({ src, alt, priority, className, fallback }: { s
         decoding="async"
         referrerPolicy="no-referrer"
         onError={() => setFailed(true)}
-        className="absolute inset-0 h-full w-full object-contain"
+        className="absolute inset-0 h-full w-full object-cover object-center"
       />
       <span className="absolute bottom-2 right-2 rounded-full bg-black/65 px-2 py-0.5 text-[0.62rem] font-medium tracking-wide text-white/90">Serving suggestion</span>
     </div>
